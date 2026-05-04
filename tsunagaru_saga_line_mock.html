@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>つながるさが LINE｜構成モック</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-mute: #5f5e5a;
+    --ink-light: #888780;
+    --line: #d4d1c8;
+    --line-faint: #e8e6df;
+    --paper: #fefdf9;
+    --paper-warm: #f5f3ea;
+    --accent: #00a3e9;
+    --accent-deep: #0c447c;
+    --line-green: #06c755;
+    --line-bg: #8cabd8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.85;
+    font-feature-settings: "palt";
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===== Sidebar layout ===== */
+  .layout {
+    display: block;
+    min-height: 100vh;
+  }
+  .sidebar {
+    display: none;
+  }
+  .sidebar-brand {
+    margin-bottom: 8px;
+    font-size: 16px;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .sidebar-tagline {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.1em;
+    margin-bottom: 40px;
+  }
+  .sidebar-group {
+    margin-bottom: 28px;
+  }
+  .sidebar-group-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .sidebar-link {
+    display: block;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: 2px;
+    border-radius: 2px;
+  }
+  .sidebar-link:hover {
+    background: rgba(255,255,255,0.06);
+    color: white;
+  }
+  .sidebar-link.active {
+    background: rgba(255,255,255,0.95);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .sidebar-bottom {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    line-height: 1.8;
+  }
+  .canvas {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(to right, rgba(0,163,233,0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,163,233,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+    min-width: 0;
+    padding: 0;
+    border-top: 14px solid var(--accent);
+    border-bottom: 14px solid var(--accent);
+  }
+  
+  /* Designed header inside canvas */
+  .designed-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 40px;
+    background: var(--paper);
+    position: relative;
+    z-index: 5;
+  }
+  .designed-logo {
+    font-size: 24px; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+  .designed-nav {
+    display: flex; gap: 36px; font-size: 13px;
+    color: var(--ink);
+    align-items: center;
+  }
+  .designed-line-btn {
+    background: var(--line-green); color: white;
+    padding: 10px 28px;
+    border-radius: 6px;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  
+  .canvas-content {
+    padding: 48px 48px 64px;
+  }
+  
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; padding: 20px; }
+    .canvas-content { padding: 32px 20px; }
+    .designed-header { padding: 14px 20px; }
+    .designed-nav { gap: 16px; font-size: 11px; }
+  }
+
+  /* ===== Page sections - show all stacked in fullscreen mode ===== */
+  main[id$="-page"] { 
+    display: block;
+    margin-bottom: 96px;
+    padding-top: 32px;
+    border-top: 1px dashed rgba(0,163,233,0.3);
+  }
+  main[id$="-page"]:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  /* ===== Section headers (designed pill) ===== */
+  .section-label {
+    display: inline-block;
+    border: 1.5px dashed var(--accent-deep);
+    color: var(--accent-deep);
+    padding: 6px 22px;
+    border-radius: 999px;
+    font-size: 11px; letter-spacing: 0.25em;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+  h1.page-title {
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
+  }
+  h2.section-title {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  h3.sub-title {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15px; }
+  p.lead { font-size: 16px; line-height: 2.0; color: var(--ink-mute); margin-bottom: 48px; max-width: 720px; }
+
+  /* ===== Section blocks ===== */
+  .section {
+    margin-bottom: 96px;
+  }
+
+  /* ===== Phone frame ===== */
+  .phones-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 48px;
+    align-items: start;
+  }
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .phone-caption {
+    margin-top: 16px;
+    text-align: center;
+  }
+  .phone-caption-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+  }
+  .phone-caption-title {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .phone {
+    width: 360px;
+    background: #ddd;
+    border: 1px solid #1a1a1a;
+    border-radius: 36px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .phone-inner {
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    aspect-ratio: 9 / 19.5;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ===== iOS-style status bar ===== */
+  .status-bar {
+    height: 44px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: black;
+    flex-shrink: 0;
+  }
+  .status-icons {
+    display: flex; gap: 6px; align-items: center;
+    font-size: 12px;
+  }
+  .status-icons::before { content: "●●●●"; letter-spacing: -2px; font-size: 10px; }
+  .status-icons::after { content: "▮"; font-size: 14px; margin-left: 4px; }
+
+  /* ===== LINE chat header ===== */
+  .line-chat-header {
+    background: #ededed;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #d8d8d8;
+    flex-shrink: 0;
+  }
+  .line-chat-back { color: #5d8fea; font-size: 18px; padding: 4px; }
+  .line-chat-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .line-chat-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .line-chat-title .sub {
+    display: block;
+    font-size: 10px;
+    color: var(--ink-light);
+    font-weight: 400;
+    margin-top: 1px;
+  }
+  .line-chat-actions {
+    display: flex; gap: 12px;
+    color: var(--ink-mute);
+    font-size: 16px;
+  }
+
+  /* ===== LINE chat body ===== */
+  .line-chat-body {
+    flex: 1;
+    background: var(--line-bg);
+    padding: 16px 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-time {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    margin: 4px 0;
+  }
+  .chat-day-divider {
+    text-align: center;
+    margin: 8px 0;
+    font-size: 11px;
+  }
+  .chat-day-divider span {
+    display: inline-block;
+    background: rgba(0,0,0,0.2);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  /* Message bubbles */
+  .msg-row {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    max-width: 85%;
+  }
+  .msg-row.from-me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .msg-bubble {
+    background: white;
+    color: var(--ink);
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    position: relative;
+  }
+  .msg-row.from-me .msg-bubble {
+    background: #94e44b;
+    color: var(--ink);
+  }
+  .msg-bubble strong { font-weight: 500; }
+  .msg-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.95);
+    align-self: flex-end;
+    padding-bottom: 2px;
+  }
+
+  /* Rich card message */
+  .msg-rich-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    width: 240px;
+  }
+  .msg-rich-img {
+    aspect-ratio: 4 / 3;
+    background: linear-gradient(135deg, #e0d7c4 25%, transparent 25%) -8px 0,
+                linear-gradient(225deg, #e0d7c4 25%, transparent 25%) -8px 0,
+                linear-gradient(315deg, #e0d7c4 25%, transparent 25%),
+                linear-gradient(45deg, #e0d7c4 25%, transparent 25%);
+    background-size: 16px 16px;
+    background-color: #f0ebd7;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-light); font-size: 10px;
+    text-align: center;
+    padding: 8px;
+  }
+  .msg-rich-body {
+    padding: 12px 14px;
+  }
+  .msg-rich-cat {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .msg-rich-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .msg-rich-desc {
+    font-size: 11px;
+    color: var(--ink-mute);
+    line-height: 1.7;
+  }
+  .msg-rich-cta {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    border-top: 1px solid #ededed;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ===== Rich menu (bottom) ===== */
+  .line-richmenu {
+    background: white;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+  }
+  .richmenu-toggle {
+    height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--ink-mute);
+    background: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .richmenu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+      "campaign campaign website"
+      "articles jobnav scholarship";
+    height: 240px;
+    background: var(--ink);
+    color: white;
+  }
+  .richmenu-cell {
+    border-right: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    text-align: center;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  /* Reset old nth-child borders */
+  .richmenu-cell:nth-child(3n) { border-right: 1px solid rgba(255,255,255,0.15); }
+  .richmenu-cell:nth-child(n+4) { border-bottom: 1px solid rgba(255,255,255,0.15); }
+  /* Remove edge borders */
+  .richmenu-cell.r-campaign { grid-area: campaign; border-bottom: 1px solid rgba(255,255,255,0.15); }
+  .richmenu-cell.r-website { grid-area: website; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
+  .richmenu-cell.r-articles { grid-area: articles; border-bottom: none; }
+  .richmenu-cell.r-jobnav { grid-area: jobnav; border-bottom: none; }
+  .richmenu-cell.r-scholarship { grid-area: scholarship; border-right: none; border-bottom: none; }
+  
+  .richmenu-cell-icon {
+    font-size: 22px;
+    margin-bottom: 6px;
+    color: var(--accent);
+  }
+  .richmenu-cell-label {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+  }
+  .richmenu-cell.accent {
+    background: var(--accent);
+  }
+  .richmenu-cell.accent .richmenu-cell-icon { color: white; }
+  /* Campaign cell larger styling */
+  .richmenu-cell.r-campaign .richmenu-cell-label {
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* Input bar */
+  .line-input-bar {
+    height: 44px;
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .line-input-bar-icons {
+    display: flex; gap: 12px;
+    color: #888;
+    font-size: 16px;
+  }
+  .line-input-bar-input {
+    flex: 1;
+    height: 28px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #d8d8d8;
+  }
+
+  /* ===== Profile screen (友だち追加前) ===== */
+  .line-profile {
+    flex: 1;
+    background: white;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .profile-cover {
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #00a3e9 0%, #0c447c 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    color: white;
+    padding-bottom: 48px;
+    text-align: center;
+    position: relative;
+  }
+  .profile-cover-text {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    opacity: 0.85;
+  }
+  .profile-cover-tagline {
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+  .profile-icon {
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid white;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+  .profile-body {
+    padding: 48px 20px 24px;
+    text-align: center;
+  }
+  .profile-name {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .profile-handle {
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+  }
+  .profile-cert {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .profile-cert::before { content: "✓"; font-weight: 700; }
+  .profile-desc {
+    font-size: 12px;
+    color: var(--ink-mute);
+    line-height: 1.8;
+    text-align: left;
+    padding: 16px 12px;
+    background: var(--paper-warm);
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+  .profile-cta {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: var(--line-green);
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    padding-top: 16px;
+    border-top: 1px solid #ededed;
+  }
+
+  /* ===== Spec table ===== */
+  .spec-table {
+    width: 100%;
+    border-top: 1px solid var(--ink);
+    margin-top: 32px;
+  }
+  .spec-table tr {
+    border-bottom: 1px solid var(--line-faint);
+  }
+  .spec-table th {
+    text-align: left;
+    width: 200px;
+    padding: 16px 0;
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    vertical-align: top;
+  }
+  .spec-table td {
+    padding: 16px 0;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  /* ===== Sticky note for callouts ===== */
+  .callout {
+    background: var(--paper-warm);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    margin: 32px 0;
+    font-size: 13px;
+    color: var(--ink-mute);
+    line-height: 1.95;
+  }
+  .callout-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  /* ===== Image placeholder ===== */
+  .img-ph {
+    background: var(--paper-warm);
+    border: 1px solid var(--line-faint);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--ink-light);
+    text-align: center;
+    padding: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ===== Sidebar ===== -->
+<aside class="sidebar">
+  <div class="sidebar-brand">TSUNAGARU SAGA</div>
+  <div class="sidebar-tagline">— LINE mockup v1 —</div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">PROFILE</div>
+    <a class="sidebar-link active" data-target="profile-page">プロフィール画面</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">CHAT</div>
+    <a class="sidebar-link" data-target="welcome-page">あいさつ ／ 友だち追加直後</a>
+    <a class="sidebar-link" data-target="broadcast-page">配信メッセージ</a>
+    <a class="sidebar-link" data-target="keyword-page">キーワード応答</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">RICH MENU</div>
+    <a class="sidebar-link" data-target="richmenu-page">リッチメニュー</a>
+  </div>
+
+  <div class="sidebar-bottom">
+    PROTOTYPE<br>
+    LINE構成確認用モック<br><br>
+    運営：佐賀県産業人材課
+  </div>
+</aside>
+
+<!-- ===== Canvas ===== -->
+<div class="canvas">
+
+<header class="designed-header">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <span style="color:var(--ink-mute); font-size:11px; letter-spacing:0.2em;">LINE 構成モック</span>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<div class="canvas-content">
+
+
+<!-- ============================================================ -->
+<!-- ===== PROFILE PAGE ===== -->
+<!-- ============================================================ -->
+<main id="profile-page" class="active">
+  <div class="section-label">PROFILE ／ 友だち追加前の画面</div>
+  <h1 class="page-title">LINE公式アカウント<br>「つながるさが」</h1>
+  <p class="lead">QRコードや友だち追加リンクから訪れた人が、最初に目にする画面です。アカウントの存在意義と、追加後に何が届くのかを伝えます。</p>
+
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"></div>
+          </div>
+          <div class="line-profile">
+            <div class="profile-cover">
+              <div>
+                <div class="profile-cover-text">TSUNAGARU SAGA</div>
+                <div class="profile-cover-tagline">外に出たからこそ、はじまる佐賀との関係。</div>
+              </div>
+              <div class="profile-icon">つながる<br>さが</div>
+            </div>
+            <div class="profile-body">
+              <div class="profile-name">つながるさが</div>
+              <div class="profile-handle">@tsunagaru-saga</div>
+              <div class="profile-cert">認証済みアカウント</div>
+              <div class="profile-desc">
+                佐賀を出た学生のための、佐賀のメディアです。新しい記事や、就活・暮らしに役立つ情報を、月2回お届けします。<br><br>
+                ▼ 配信内容<br>
+                ・学生記者の取材記事<br>
+                ・佐賀県からのおしらせ<br>
+                ・帰省タイミングのイベント情報
+              </div>
+              <a class="profile-cta">友だち追加</a>
+            </div>
+            <div class="profile-stats">
+              <div>友だち 1,200+</div>
+              <div>運営：佐賀県産業人材課</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">SCREEN 01</div>
+        <div class="phone-caption-title">プロフィール画面</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">DESIGN NOTE</div>
+    カバー画像とアイコンは、サイトの世界観と統一。タグライン「外に出たからこそ、はじまる佐賀との関係。」を最初に出すことで、Webサイト訪問前にコンセプトを伝えます。「認証済みアカウント」表記で、正規の県アカウントであることを明示。
+  </div>
+
+  <h2 class="section-title">アカウントの基本情報</h2>
+  <table class="spec-table">
+    <tr><th>アカウント名</th><td>つながるさが</td></tr>
+    <tr><th>アカウント種別</th><td>認証済みアカウント（地方公共団体プラン）</td></tr>
+    <tr><th>カバー画像</th><td>1040 × 585px ／ ブランドカラー（イシンブルー #00A3E9）</td></tr>
+    <tr><th>アイコン画像</th><td>正方形 ／ ロゴまたはシンボル</td></tr>
+    <tr><th>説明文</th><td>140文字以内 ／ 配信内容を箇条書きで明示</td></tr>
+    <tr><th>ターゲット</th><td>佐賀県出身で県外に進学した学生</td></tr>
+  </table>
+</main>
+
+
+<!-- ============================================================ -->
+<!-- ===== WELCOME PAGE ===== -->
+<!-- ============================================================ -->
+<main id="welcome-page">
+  <div class="section-label">WELCOME ／ 友だち追加直後のあいさつ</div>
+  <h1 class="page-title">はじめまして、のメッセージ</h1>
+  <p class="lead">友だち追加された瞬間に、自動で送られるメッセージです。最初の一言で、このアカウントが何者で、何をしてくれるのかを伝えます。</p>
+
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"></div>
+          </div>
+          <div class="line-chat-header">
+            <div class="line-chat-back">‹</div>
+            <div class="line-chat-icon">つな<br>がる</div>
+            <div class="line-chat-title">
+              つながるさが
+              <span class="sub">認証済みアカウント</span>
+            </div>
+            <div class="line-chat-actions">⋯</div>
+          </div>
+          <div class="line-chat-body">
+            <div class="chat-day-divider"><span>今日</span></div>
+            
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                はじめまして。<br>
+                「つながるさが」です。
+              </div>
+              <div class="msg-time">9:32</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                友だち追加、ありがとうございます。<br>
+                このアカウントでは、佐賀を出た学生に向けて、月に2回くらいのペースで佐賀の記事をお届けします。
+              </div>
+              <div class="msg-time">9:32</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                <strong>📨 こんな情報を届けます</strong><br><br>
+                ・学生記者の取材記事<br>
+                ・佐賀県からのおしらせ<br>
+                ・帰省タイミングで開催されるイベント情報<br>
+                ・LINE登録者限定のキャンペーン
+              </div>
+              <div class="msg-time">9:32</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-rich-card">
+                <div class="msg-rich-img">特集記事サムネ画像</div>
+                <div class="msg-rich-body">
+                  <div class="msg-rich-cat">特集記事</div>
+                  <div class="msg-rich-title">「奨学金返還支援」って本当に返ってくる？</div>
+                  <div class="msg-rich-desc">学生記者が、Uターン就職した先輩の手続きに4日間密着しました。</div>
+                </div>
+                <a class="msg-rich-cta">記事を読む →</a>
+              </div>
+              <div class="msg-time">9:32</div>
+            </div>
+            
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                下のメニューから、いつでも記事や記者紹介、おしらせをご覧いただけます。<br><br>
+                それでは、ゆっくりしていってくださいね。
+              </div>
+              <div class="msg-time">9:32</div>
+            </div>
+          </div>
+          <div class="line-richmenu">
+            <div class="richmenu-toggle">▼ メニューを閉じる</div>
+            <div class="richmenu-grid" style="height: 170px;">
+              <div class="richmenu-cell accent r-campaign">
+                <div class="richmenu-cell-icon">🎁</div>
+                <div class="richmenu-cell-label">特別キャンペーン<br>佐賀県イベント参加で<br>LINEポイント</div>
+              </div>
+              <div class="richmenu-cell r-website">
+                <div class="richmenu-cell-icon">🌐</div>
+                <div class="richmenu-cell-label">つながるさが<br>公式サイト</div>
+              </div>
+              <div class="richmenu-cell r-articles">
+                <div class="richmenu-cell-icon">📰</div>
+                <div class="richmenu-cell-label">おすすめの<br>佐賀情報</div>
+              </div>
+              <div class="richmenu-cell r-jobnav">
+                <div class="richmenu-cell-icon">💼</div>
+                <div class="richmenu-cell-label">さがジョブナビ</div>
+              </div>
+              <div class="richmenu-cell r-scholarship">
+                <div class="richmenu-cell-icon">🎓</div>
+                <div class="richmenu-cell-label">奨学金返還<br>支援事業</div>
+              </div>
+            </div>
+          </div>
+          <div class="line-input-bar">
+            <div class="line-input-bar-icons">＋</div>
+            <div class="line-input-bar-input"></div>
+            <div class="line-input-bar-icons">😊</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">SCREEN 02</div>
+        <div class="phone-caption-title">あいさつメッセージ＋初回特集記事</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">DESIGN NOTE</div>
+    あいさつメッセージは、テキスト3通＋リッチカード1通＋締めのテキスト1通の構成。最初の1通で名乗り、2通目で配信頻度を伝え、3通目で配信内容を箇条書きで提示。リッチカードで具体的な記事を見せることで、登録のメリットを実感できる流れにしています。
+  </div>
+</main>
+
+
+<!-- ============================================================ -->
+<!-- ===== BROADCAST PAGE ===== -->
+<!-- ============================================================ -->
+<main id="broadcast-page">
+  <div class="section-label">BROADCAST ／ 月2回の配信メッセージ</div>
+  <h1 class="page-title">記事更新のお知らせ</h1>
+  <p class="lead">新しい記事が公開されたタイミングや、佐賀県からのお知らせを、月2回のペースで配信します。リッチカードで記事のサムネとタイトルを見せ、サイトに誘導します。</p>
+
+  <div class="phones-row">
+    <!-- Phone 1: 記事配信 -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div class="status-icons"></div></div>
+          <div class="line-chat-header">
+            <div class="line-chat-back">‹</div>
+            <div class="line-chat-icon">つな<br>がる</div>
+            <div class="line-chat-title">つながるさが<span class="sub">認証済みアカウント</span></div>
+            <div class="line-chat-actions">⋯</div>
+          </div>
+          <div class="line-chat-body">
+            <div class="chat-day-divider"><span>10月15日（火）</span></div>
+            
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                こんにちは、つながるさがです。<br>
+                今月の特集記事が公開されました。
+              </div>
+              <div class="msg-time">12:00</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-rich-card">
+                <div class="msg-rich-img">特集ヒーロー画像</div>
+                <div class="msg-rich-body">
+                  <div class="msg-rich-cat">特集 ・ 13min read</div>
+                  <div class="msg-rich-title">「奨学金返還支援」って本当に返ってくる？Uターン先輩の手続きに密着</div>
+                  <div class="msg-rich-desc">学生記者が4日間かけて取材した、申請の現場ルポです。</div>
+                </div>
+                <a class="msg-rich-cta">記事を読む →</a>
+              </div>
+              <div class="msg-time">12:00</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                ▼ 今月の他の記事はこちら<br>
+                ・佐賀のIT企業って、どんな会社があるの？<br>
+                ・佐賀出身なのに食べたことなかった、地元の隠れたグルメ7選<br><br>
+                <strong>記事一覧 →</strong> tsunagaru-saga.jp
+              </div>
+              <div class="msg-time">12:00</div>
+            </div>
+          </div>
+          <div class="line-input-bar">
+            <div class="line-input-bar-icons">＋</div>
+            <div class="line-input-bar-input"></div>
+            <div class="line-input-bar-icons">😊</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">PATTERN A</div>
+        <div class="phone-caption-title">特集記事の公開告知</div>
+      </div>
+    </div>
+
+    <!-- Phone 2: イベント告知 -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div class="status-icons"></div></div>
+          <div class="line-chat-header">
+            <div class="line-chat-back">‹</div>
+            <div class="line-chat-icon">つな<br>がる</div>
+            <div class="line-chat-title">つながるさが<span class="sub">認証済みアカウント</span></div>
+            <div class="line-chat-actions">⋯</div>
+          </div>
+          <div class="line-chat-body">
+            <div class="chat-day-divider"><span>12月5日（金）</span></div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                <strong>🎁 LINE登録者限定のおしらせ</strong><br><br>
+                帰省タイミングで開催される、佐賀牛プレゼントキャンペーンのご案内です。
+              </div>
+              <div class="msg-time">18:00</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-rich-card">
+                <div class="msg-rich-img">佐賀牛プレゼント画像</div>
+                <div class="msg-rich-body">
+                  <div class="msg-rich-cat" style="color:#BA7517;">プレゼント企画</div>
+                  <div class="msg-rich-title">LINE登録者限定 佐賀牛プレゼント</div>
+                  <div class="msg-rich-desc">抽選で20名さまに佐賀牛をお届けします。締切：12月31日</div>
+                </div>
+                <a class="msg-rich-cta">応募する →</a>
+              </div>
+              <div class="msg-time">18:00</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                帰省で佐賀に戻られる方は、ぜひこちらもご覧ください。<br><br>
+                ▼ 帰省タイミングのイベント<br>
+                ・佐賀出身学生 同窓会（12/28）<br>
+                ・佐賀IT企業 合同説明会（12/5）
+              </div>
+              <div class="msg-time">18:00</div>
+            </div>
+          </div>
+          <div class="line-input-bar">
+            <div class="line-input-bar-icons">＋</div>
+            <div class="line-input-bar-input"></div>
+            <div class="line-input-bar-icons">😊</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">PATTERN B</div>
+        <div class="phone-caption-title">プレゼント・イベント告知</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">DESIGN NOTE</div>
+    配信パターンは「記事公開告知」「イベント・プレゼント告知」の2系統。導入文 → リッチカード → 補足情報の3メッセージ構成で、視認性と詳細情報のバランスを取ります。リッチカードのサムネ・カテゴリ・タイトル・説明文・CTAは、すべてサイトの記事カードと統一されたフォーマットです。
+  </div>
+
+  <h2 class="section-title">配信スケジュールの設計</h2>
+  <table class="spec-table">
+    <tr><th>配信頻度</th><td>月2回（記事公開時 ＋ おしらせ）</td></tr>
+    <tr><th>配信タイミング</th><td>平日12:00 ／ 18:00 を推奨（学生の昼休み・移動時間）</td></tr>
+    <tr><th>1配信あたりの構成</th><td>テキスト1通 ＋ リッチカード1〜2通 ＋ 補足テキスト1通</td></tr>
+    <tr><th>セグメント配信</th><td>学年・進学先地域による絞り込みも可能（オプション）</td></tr>
+    <tr><th>配信主体</th><td>佐賀県産業人材課（管理画面から職員が配信操作）</td></tr>
+  </table>
+</main>
+
+
+<!-- ============================================================ -->
+<!-- ===== KEYWORD PAGE ===== -->
+<!-- ============================================================ -->
+<main id="keyword-page">
+  <div class="section-label">KEYWORD ／ キーワード応答</div>
+  <h1 class="page-title">ユーザーの問いかけに、自動で返信</h1>
+  <p class="lead">ユーザーがメッセージを送ったときに、特定のキーワードに対して自動で返信します。仕様書要件に対応した、最大20シナリオを設計します。</p>
+
+  <div class="phones-row">
+    <!-- Phone 1: 制度キーワード -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div class="status-icons"></div></div>
+          <div class="line-chat-header">
+            <div class="line-chat-back">‹</div>
+            <div class="line-chat-icon">つな<br>がる</div>
+            <div class="line-chat-title">つながるさが<span class="sub">認証済みアカウント</span></div>
+            <div class="line-chat-actions">⋯</div>
+          </div>
+          <div class="line-chat-body">
+            <div class="chat-day-divider"><span>今日</span></div>
+
+            <div class="msg-row from-me">
+              <div class="msg-bubble">奨学金</div>
+              <div class="msg-time">14:23</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                <strong>奨学金返還支援制度について</strong><br><br>
+                佐賀で就職・定住する若い人の奨学金返還を、佐賀県が支援する制度です。<br><br>
+                ・最大150万円の返還支援<br>
+                ・対象は県内の認定企業<br>
+                ・5年間の県内定住が条件<br><br>
+                ▼ 詳しくは公式ページへ<br>
+                ss.saga-job.jp/scholarship
+              </div>
+              <div class="msg-time">14:23</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-rich-card">
+                <div class="msg-rich-img">特集記事サムネ</div>
+                <div class="msg-rich-body">
+                  <div class="msg-rich-cat">学生記者の体験記</div>
+                  <div class="msg-rich-title">「奨学金返還支援」って本当に返ってくる？</div>
+                  <div class="msg-rich-desc">先輩の申請に4日間密着した特集記事もあわせてどうぞ。</div>
+                </div>
+                <a class="msg-rich-cta">記事を読む →</a>
+              </div>
+              <div class="msg-time">14:23</div>
+            </div>
+          </div>
+          <div class="line-input-bar">
+            <div class="line-input-bar-icons">＋</div>
+            <div class="line-input-bar-input"></div>
+            <div class="line-input-bar-icons">😊</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">EXAMPLE A</div>
+        <div class="phone-caption-title">制度キーワード（「奨学金」）</div>
+      </div>
+    </div>
+
+    <!-- Phone 2: 就活キーワード -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div class="status-icons"></div></div>
+          <div class="line-chat-header">
+            <div class="line-chat-back">‹</div>
+            <div class="line-chat-icon">つな<br>がる</div>
+            <div class="line-chat-title">つながるさが<span class="sub">認証済みアカウント</span></div>
+            <div class="line-chat-actions">⋯</div>
+          </div>
+          <div class="line-chat-body">
+            <div class="chat-day-divider"><span>今日</span></div>
+
+            <div class="msg-row from-me">
+              <div class="msg-bubble">就活</div>
+              <div class="msg-time">21:08</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                <strong>佐賀での就活情報</strong><br><br>
+                佐賀の企業や求人情報は、佐賀県公式の就職情報サイト「さがジョブナビ」にまとまっています。<br><br>
+                ・登録企業 1,200社以上<br>
+                ・インターンシップ情報あり<br>
+                ・就活交通費補助の対象<br><br>
+                ▼ さがジョブナビ<br>
+                ss.saga-job.jp
+              </div>
+              <div class="msg-time">21:08</div>
+            </div>
+
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                <strong>📅 就活関連のイベント</strong><br><br>
+                ・佐賀IT企業 合同説明会（12/5・オンライン）<br>
+                ・佐賀出身者だけのオンライン就活カフェ（12/21）<br><br>
+                ▼ 詳細は記事一覧から<br>
+                tsunagaru-saga.jp/events
+              </div>
+              <div class="msg-time">21:08</div>
+            </div>
+          </div>
+          <div class="line-input-bar">
+            <div class="line-input-bar-icons">＋</div>
+            <div class="line-input-bar-input"></div>
+            <div class="line-input-bar-icons">😊</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">EXAMPLE B</div>
+        <div class="phone-caption-title">就活キーワード（「就活」）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">DESIGN NOTE</div>
+    キーワード応答は、即時性のある情報提供と、サイト記事への送客の両方を担います。テキストで要点を伝え、リッチカードで関連記事に誘導する2段階構成。LINE側で完結する情報と、Web側に深掘りできる情報をバランスよく配置します。
+  </div>
+
+  <h2 class="section-title">キーワード応答シナリオ（20種）</h2>
+  <p style="font-size:14px; color:var(--ink-mute); margin-bottom:32px;">仕様書要件にもとづき、最大20種のキーワードに対する応答を設計します。LINE標準機能で、1シナリオあたり最大51キーワードまで紐付け可能。</p>
+
+  <table class="spec-table">
+    <tr><th>カテゴリ</th><td><strong>シナリオ例</strong></td></tr>
+    <tr><th>制度・支援</th><td>奨学金 ／ 返還支援 ／ 移住支援 ／ 交通費補助 ／ 制度</td></tr>
+    <tr><th>就職・キャリア</th><td>就活 ／ 求人 ／ インターン ／ 内定 ／ 企業</td></tr>
+    <tr><th>暮らし・佐賀</th><td>家賃 ／ 移住 ／ 帰省 ／ 一人暮らし</td></tr>
+    <tr><th>イベント</th><td>イベント ／ 説明会 ／ プレゼント ／ キャンペーン</td></tr>
+    <tr><th>サイト</th><td>記事 ／ 学生記者 ／ メニュー ／ ヘルプ</td></tr>
+  </table>
+</main>
+
+
+<!-- ============================================================ -->
+<!-- ===== RICHMENU PAGE ===== -->
+<!-- ============================================================ -->
+<main id="richmenu-page">
+  <div class="section-label">RICH MENU ／ 常駐メニュー</div>
+  <h1 class="page-title">画面下に常時表示されるメニュー</h1>
+  <p class="lead">トーク画面の下部に常時表示されるメニュー画像です。タップでサイトの該当ページに遷移したり、キーワード応答を呼び出します。学生記者プログラムの応募ボタンを目立つ位置に配置します。</p>
+
+  <div class="phones-row">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="status-bar"><span>9:41</span><div class="status-icons"></div></div>
+          <div class="line-chat-header">
+            <div class="line-chat-back">‹</div>
+            <div class="line-chat-icon">つな<br>がる</div>
+            <div class="line-chat-title">つながるさが<span class="sub">認証済みアカウント</span></div>
+            <div class="line-chat-actions">⋯</div>
+          </div>
+          <div class="line-chat-body">
+            <div class="chat-day-divider"><span>今日</span></div>
+            <div class="msg-row">
+              <div class="msg-avatar">つな<br>がる</div>
+              <div class="msg-bubble">
+                下のメニューから、いつでも記事やキャンペーン情報、関連サイトにアクセスできます。
+              </div>
+              <div class="msg-time">9:32</div>
+            </div>
+          </div>
+          <div class="line-richmenu">
+            <div class="richmenu-toggle">▲ メニューを開く</div>
+            <div class="richmenu-grid">
+              <div class="richmenu-cell accent r-campaign">
+                <div class="richmenu-cell-icon">🎁</div>
+                <div class="richmenu-cell-label">特別キャンペーン<br>佐賀県イベント参加で<br>LINEポイントもらえる</div>
+              </div>
+              <div class="richmenu-cell r-website">
+                <div class="richmenu-cell-icon">🌐</div>
+                <div class="richmenu-cell-label">つながるさが<br>公式ウェブサイト</div>
+              </div>
+              <div class="richmenu-cell r-articles">
+                <div class="richmenu-cell-icon">📰</div>
+                <div class="richmenu-cell-label">おすすめの<br>佐賀情報</div>
+              </div>
+              <div class="richmenu-cell r-jobnav">
+                <div class="richmenu-cell-icon">💼</div>
+                <div class="richmenu-cell-label">さがジョブナビ</div>
+              </div>
+              <div class="richmenu-cell r-scholarship">
+                <div class="richmenu-cell-icon">🎓</div>
+                <div class="richmenu-cell-label">佐賀県奨学金<br>返還支援事業</div>
+              </div>
+            </div>
+          </div>
+          <div class="line-input-bar">
+            <div class="line-input-bar-icons">＋</div>
+            <div class="line-input-bar-input"></div>
+            <div class="line-input-bar-icons">😊</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-caption">
+        <div class="phone-caption-label">SCREEN</div>
+        <div class="phone-caption-title">リッチメニュー展開時</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">DESIGN NOTE</div>
+    変則5マスレイアウト（上段：横長キャンペーン枠＋公式サイト／下段：3マス均等）。最も大きい上段左の枠に「特別キャンペーン」を配置し、登録者へのインセンティブを毎回視認させる設計。下段はおすすめ記事・関連サイト2つで、メディア導線と佐賀県の他広報事業（さがジョブナビ、奨学金返還支援事業）を1タップで結ぶハブとして機能させる。
+  </div>
+
+  <h2 class="section-title">メニュー設計の意図</h2>
+  <table class="spec-table">
+    <tr><th>① 特別キャンペーン ★</th><td>佐賀県イベントに参加するとLINEポイントがもらえるキャンペーンページに遷移／ブランドカラーで強調／LINE登録のインセンティブとして機能</td></tr>
+    <tr><th>② つながるさが公式ウェブサイト</th><td>サイトのトップページ（top）に遷移／LINEからWebへの主導線</td></tr>
+    <tr><th>③ おすすめの佐賀情報</th><td>編集部おすすめのサイト記事に遷移／キュレーションされた記事への入り口</td></tr>
+    <tr><th>④ さがジョブナビ</th><td>佐賀県公式の就職情報サイトに外部遷移／関連事業との連動</td></tr>
+    <tr><th>⑤ 佐賀県奨学金返還支援事業</th><td>奨学金返還支援事業のページに外部遷移／関連事業との連動</td></tr>
+  </table>
+
+  <h2 class="section-title" style="margin-top:64px;">リッチメニュー画像の仕様</h2>
+  <table class="spec-table">
+    <tr><th>サイズ</th><td>2500 × 1686px（推奨）／ 5マス変則分割</td></tr>
+    <tr><th>上段</th><td>左 約1666 × 843px（キャンペーン）／ 右 約833 × 843px（公式サイト）</td></tr>
+    <tr><th>下段</th><td>3マス均等／ 約833 × 843px</td></tr>
+    <tr><th>デザイン</th><td>&SAGAブランドガイドラインに準拠／イシンブルー（#00A3E9）を主軸</td></tr>
+    <tr><th>切り替え</th><td>季節やキャンペーンに合わせて差し替え可能（管理画面で更新）</td></tr>
+  </table>
+</main>
+
+
+</div> <!-- /.canvas-content -->
+</div> <!-- /.canvas -->
+</div> <!-- /.layout -->
+
+<script>
+(function() {
+  const links = document.querySelectorAll('.sidebar-link');
+  const pages = document.querySelectorAll('main[id$="-page"]');
+  
+  function switchTo(targetId) {
+    pages.forEach(p => {
+      if (p.id === targetId) p.classList.add('active');
+      else p.classList.remove('active');
+    });
+    links.forEach(l => {
+      if (l.dataset.target === targetId) l.classList.add('active');
+      else l.classList.remove('active');
+    });
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTo(link.dataset.target);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
