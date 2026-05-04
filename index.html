@@ -1,0 +1,3032 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>つながるさが｜構成モック</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-mute: #5f5e5a;
+    --ink-light: #888780;
+    --line: #d4d1c8;
+    --line-faint: #e8e6df;
+    --paper: #fefdf9;
+    --paper-warm: #f5f3ea;
+    --accent: #00a3e9;
+    --accent-deep: #0c447c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.85;
+    font-feature-settings: "palt";
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===== Header / Navigation ===== */
+  .site-header {
+    position: sticky; top: 0;
+    background: rgba(254, 253, 249, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-faint);
+    z-index: 100;
+  }
+  .nav-wrap {
+    max-width: 1200px; margin: 0 auto;
+    padding: 18px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nav-left, .nav-right {
+    display: flex; gap: 24px;
+    font-size: 13px; letter-spacing: 0.05em;
+    color: var(--ink-mute);
+  }
+  .nav-left a:hover, .nav-right a:hover { color: var(--accent); }
+  .nav-logo {
+    text-align: center; font-weight: 500;
+    line-height: 1.3;
+  }
+  .nav-logo-en {
+    font-size: 16px; letter-spacing: 0.15em;
+    color: var(--ink);
+  }
+  .nav-logo-jp {
+    font-size: 11px; color: var(--ink-light);
+    letter-spacing: 0.05em; margin-top: 2px;
+  }
+
+  /* ===== Page divider ===== */
+  .page-divider {
+    height: 80px;
+    background: var(--paper-warm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; letter-spacing: 0.4em;
+    color: var(--ink-light);
+    border-top: 1px solid var(--line-faint);
+    border-bottom: 1px solid var(--line-faint);
+  }
+
+  /* ===== Layout ===== */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .container-wide {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ===== Section labels ===== */
+  .section-label {
+    display: inline-block;
+    border: 1.5px dashed var(--accent-deep);
+    color: var(--accent-deep);
+    padding: 6px 22px;
+    border-radius: 999px;
+    font-size: 11px; letter-spacing: 0.25em;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .section-label-accent { color: var(--accent); border-color: var(--accent); }
+
+  /* ===== Headlines ===== */
+  h1.hero-title {
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+  }
+  h1.hero-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  h2.section-title {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
+  }
+  h3.sub-title {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  h4.item-title {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  p { margin-bottom: 24px; font-size: 16px; }
+  p.lead { font-size: 17px; line-height: 1.95; }
+
+  /* ===== Image placeholder ===== */
+  .img-ph {
+    background: var(--paper-warm);
+    border: 1px solid var(--line-faint);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--ink-light);
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 16px;
+  }
+  .img-ph-hero {
+    aspect-ratio: 16 / 9;
+    margin-bottom: 56px;
+  }
+  .img-ph-wide {
+    aspect-ratio: 16 / 9;
+    margin: 32px 0;
+  }
+  .img-ph-square {
+    aspect-ratio: 1;
+  }
+  .img-ph-thumb {
+    aspect-ratio: 4 / 3;
+    margin-bottom: 16px;
+  }
+
+  /* ===== Section blocks ===== */
+  .section {
+    padding: 96px 0;
+  }
+  .section-narrow {
+    padding: 64px 0;
+  }
+  .section-warm {
+    background: var(--paper-warm);
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding: 80px 0 96px;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--ink-mute);
+    line-height: 2.0;
+    margin-bottom: 48px;
+  }
+  .hero-cta {
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--accent-deep);
+    background: var(--accent-deep);
+    color: white;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent-deep);
+    border-color: var(--accent-deep);
+  }
+  .btn-line {
+    background: #06c755; border-color: #06c755; color: white;
+  }
+  .btn-arrow::after { content: "→"; }
+  .btn-arrow-ext::after { content: "↗"; }
+
+  /* ===== TOP cards (記事 etc) ===== */
+  .article-card-link {
+    display: block;
+    margin-bottom: 56px;
+  }
+  .article-card-link:last-child { margin-bottom: 0; }
+  .article-card-link h3 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+  .article-card-link p {
+    color: var(--ink-mute);
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .more-text {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    display: inline-block;
+  }
+
+  /* ===== Article meta ===== */
+  .meta {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    margin-bottom: 12px;
+  }
+  .meta-tag {
+    display: inline-block;
+    padding: 3px 14px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border: 1.5px solid var(--accent-deep);
+    border-radius: 999px;
+    margin-right: 6px;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+  .meta-tag-feature {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  /* ===== TOP layout grid for articles ===== */
+  .articles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
+  }
+  .articles-row .article-card-link { margin-bottom: 0; }
+  @media (max-width: 800px) {
+    .articles-row { grid-template-columns: 1fr; gap: 56px; }
+  }
+
+  /* Reporters horizontal scroll */
+  .reporters-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 800px) {
+    .reporters-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  .reporter-item {
+    text-align: center;
+  }
+  .reporter-item .img-ph { aspect-ratio: 1; margin-bottom: 12px; }
+  .reporter-item .name { font-size: 14px; font-weight: 500; }
+  .reporter-item .school { font-size: 12px; color: var(--ink-light); }
+
+  /* Theme tiles */
+  .theme-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 800px) {
+    .theme-row { grid-template-columns: repeat(3, 1fr); }
+  }
+  .theme-tile {
+    border: 1px solid var(--line);
+    padding: 24px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .theme-tile:hover {
+    background: var(--paper-warm);
+  }
+  .theme-tile-name { font-size: 14px; font-weight: 500; }
+  .theme-tile-count { font-size: 11px; color: var(--ink-light); margin-top: 4px; }
+
+  /* News list */
+  .news-list {
+    border-top: 1px solid var(--line-faint);
+  }
+  .news-item {
+    display: grid;
+    grid-template-columns: 100px 90px 1fr 24px;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line-faint);
+    align-items: baseline;
+    cursor: pointer;
+  }
+  .news-item:hover { color: var(--accent); }
+  .news-date { font-size: 13px; color: var(--ink-mute); }
+  .news-cat { font-size: 11px; color: var(--ink-light); letter-spacing: 0.05em; }
+  .news-title { font-size: 15px; font-weight: 500; }
+  .news-arrow { color: var(--ink-light); }
+  @media (max-width: 800px) {
+    .news-item {
+      grid-template-columns: 1fr 24px;
+      gap: 4px;
+    }
+    .news-date, .news-cat { grid-column: 1; }
+  }
+
+  /* Related sites */
+  .related-sites {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  @media (max-width: 800px) {
+    .related-sites { grid-template-columns: 1fr; }
+  }
+  .related-site {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .related-site:hover { background: var(--paper-warm); }
+  .related-site-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .related-site-desc { font-size: 12px; color: var(--ink-mute); }
+  .related-site-url { font-size: 11px; color: var(--ink-light); }
+
+  /* Chapter / numbered sections */
+  .chapter-num {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  /* Recruit page elements */
+  .why-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    margin-top: 56px;
+  }
+  @media (max-width: 800px) {
+    .why-row { grid-template-columns: 1fr; }
+  }
+  .why-item .num {
+    font-size: 36px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .why-item h4 { margin-bottom: 12px; }
+  .why-item p { color: var(--ink-mute); font-size: 14px; }
+
+  .recruit-table {
+    width: 100%;
+    border-top: 1px solid var(--ink);
+    margin-top: 32px;
+  }
+  .recruit-table tr {
+    border-bottom: 1px solid var(--line-faint);
+  }
+  .recruit-table th {
+    text-align: left;
+    width: 140px;
+    padding: 18px 0;
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-weight: 500;
+    vertical-align: top;
+  }
+  .recruit-table td {
+    padding: 18px 0;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  /* Feature article hero */
+  .feature-hero {
+    padding: 80px 0 64px;
+  }
+
+  /* Article CTA block */
+  .article-cta {
+    background: var(--paper-warm);
+    border: 2px solid var(--ink);
+    padding: 32px;
+    margin: 64px 0;
+  }
+  .article-cta-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    margin-bottom: 12px;
+  }
+  .article-cta-q {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .article-cta-desc {
+    font-size: 14px;
+    color: var(--ink-mute);
+    margin-bottom: 24px;
+  }
+
+  /* Chapter data viz */
+  .data-card {
+    background: var(--paper-warm);
+    padding: 32px;
+    margin: 32px 0;
+  }
+  .data-card-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    margin-bottom: 20px;
+  }
+  .data-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    text-align: center;
+  }
+  @media (max-width: 800px) {
+    .data-stats { grid-template-columns: 1fr 1fr; }
+  }
+  .data-stat-num {
+    font-size: 32px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .data-stat-label {
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-top: 4px;
+  }
+
+  .checklist {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .checklist-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    margin-bottom: 14px;
+  }
+  .checklist ul {
+    list-style: none;
+    font-size: 14px;
+    line-height: 2.2;
+  }
+  .checklist li::before {
+    content: "□ ";
+    color: var(--ink-light);
+  }
+
+  .timeline {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 24px;
+    padding: 14px 0;
+    border-left: 2px solid var(--accent);
+    padding-left: 24px;
+    margin-left: 8px;
+    position: relative;
+  }
+  .timeline-row::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 18px;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .timeline-day { font-size: 12px; color: var(--accent); font-weight: 500; }
+  .timeline-event { font-size: 14px; font-weight: 500; }
+
+  blockquote {
+    margin: 32px 0;
+    padding: 24px 32px;
+    background: var(--paper-warm);
+    border-left: 3px solid var(--accent);
+    font-size: 17px;
+    line-height: 2.0;
+    font-style: italic;
+    color: var(--ink-mute);
+  }
+  blockquote .by {
+    margin-top: 12px;
+    font-size: 12px;
+    font-style: normal;
+    color: var(--ink-light);
+    display: block;
+  }
+
+  /* Chapter image */
+  .chapter-img-cap {
+    font-size: 12px;
+    color: var(--ink-light);
+    text-align: center;
+    margin-top: -16px;
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+
+  /* Recruit hero */
+  .recruit-hero {
+    padding: 96px 32px;
+    background: var(--ink);
+    color: white;
+    text-align: center;
+  }
+  .recruit-hero h1 {
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+  .recruit-hero p {
+    font-size: 16px;
+    opacity: 0.85;
+    line-height: 1.95;
+    max-width: 560px;
+    margin: 0 auto 40px;
+  }
+  .recruit-hero .accent-label {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: block;
+  }
+  .recruit-hero .btn {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Strong CTA (feature article end) */
+  .feature-cta {
+    background: var(--accent);
+    color: white;
+    padding: 80px 32px;
+    text-align: center;
+  }
+  .feature-cta-label {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    opacity: 0.85;
+    margin-bottom: 16px;
+  }
+  .feature-cta h2 {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: white;
+  }
+  .feature-cta p {
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.95;
+    margin-bottom: 32px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .feature-cta-btn {
+    display: inline-block;
+    padding: 18px 40px;
+    background: white;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
+  .feature-cta-url {
+    margin-top: 16px;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  /* ===== LINE banner ===== */
+  .line-banner {
+    background: #06c755;
+    color: white;
+    padding: 48px 32px;
+    text-align: center;
+  }
+  .line-banner h3 { font-size: 22px; margin-bottom: 12px; }
+  .line-banner p { font-size: 13px; opacity: 0.9; margin-bottom: 24px; }
+  .line-banner-btn {
+    display: inline-block;
+    padding: 14px 36px;
+    background: white;
+    color: #06c755;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    background: var(--ink);
+    color: white;
+    padding: 80px 32px 32px;
+  }
+  .footer-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+  @media (max-width: 800px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  .footer-logo-jp { font-size: 18px; margin-bottom: 16px; font-weight: 500; }
+  .footer-desc { font-size: 12px; opacity: 0.7; line-height: 1.95; }
+  .footer-col-title {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    margin-bottom: 18px;
+    opacity: 0.5;
+  }
+  .footer ul { list-style: none; }
+  .footer li {
+    font-size: 13px;
+    padding: 6px 0;
+    opacity: 0.85;
+    cursor: pointer;
+  }
+  .footer li:hover { opacity: 1; color: var(--accent); }
+  .footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11px;
+    opacity: 0.5;
+  }
+
+  /* ===== Statement (about page) ===== */
+  .statement-block {
+    text-align: center;
+    padding: 80px 0;
+  }
+  .statement-tagline {
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 56px;
+  }
+  .statement-tagline em {
+    color: var(--accent);
+    font-style: normal;
+  }
+  .statement-body {
+    text-align: left;
+    font-size: 16px;
+    line-height: 2.4;
+  }
+  .statement-body p { margin-bottom: 28px; }
+
+  /* ===== Tag prototype watermark ===== */
+  .proto-tag {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    background: var(--paper);
+    padding: 6px 12px;
+    border: 1px solid var(--line-faint);
+    z-index: 200;
+  }
+
+  /* ===== Recruit form ===== */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 800px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+  .form-field-label {
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .form-input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid var(--line);
+    background: white;
+  }
+  .form-textarea {
+    width: 100%;
+    height: 100px;
+    border: 1px solid var(--line);
+    background: white;
+  }
+
+  /* ===== Theme content of feature article ===== */
+  .feature-toc {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 32px 0;
+    margin: 48px 0 64px;
+  }
+  .feature-toc-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-light);
+    margin-bottom: 20px;
+  }
+  .feature-toc-list {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .feature-toc-list li {
+    padding: 8px 0;
+    font-size: 14px;
+  }
+  .feature-toc-list li::before {
+    counter-increment: toc;
+    content: "0" counter(toc);
+    color: var(--accent);
+    font-weight: 500;
+    margin-right: 16px;
+  }
+
+  /* ===== Sidebar layout ===== */
+  body { display: block; }
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+  .sidebar {
+    background: var(--ink);
+    color: white;
+    padding: 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid #333;
+  }
+  .sidebar-brand {
+    margin-bottom: 8px;
+    font-size: 16px;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .sidebar-tagline {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.1em;
+    margin-bottom: 40px;
+  }
+  .sidebar-group {
+    margin-bottom: 28px;
+  }
+  .sidebar-group-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .sidebar-link {
+    display: block;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: 2px;
+    border-radius: 2px;
+  }
+  .sidebar-link:hover {
+    background: rgba(255,255,255,0.06);
+    color: white;
+  }
+  .sidebar-link.active {
+    background: rgba(255,255,255,0.95);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .sidebar-bottom {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    line-height: 1.8;
+  }
+  .canvas {
+    background: var(--paper);
+    min-width: 0;
+  }
+
+  /* Hide page-divider in sidebar mode */
+  .page-divider { display: none; }
+
+  /* Page sections become hidden by default */
+  main[id$="-page"] { display: none; }
+  main[id$="-page"].active { display: block; }
+
+  /* Apply grid-paper background to all main pages (designed look across site) */
+  main[id$="-page"] {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(to right, rgba(0,163,233,0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,163,233,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  /* Top page already has its own backgrounds */
+  main#top-page { background: var(--paper); }
+
+  /* Hide the standard sticky header (designed pages have their own design) */
+  .site-header { display: none; }
+
+  /* Add brand band wrapper for non-top pages */
+  main[id$="-page"]:not(#top-page) {
+    border-top: 14px solid var(--accent);
+    border-bottom: 14px solid var(--accent);
+  }
+
+  /* Hide the proto-tag by default since sidebar shows it */
+  .proto-tag { display: none; }
+
+  /* ===== Designed TOP styles (TOP page only) ===== */
+  
+  /* Brand bands top/bottom (over the canvas, only inside top-page hero block) */
+  .designed-top-wrap {
+    background: var(--paper);
+    padding: 0;
+    position: relative;
+  }
+  .brand-band {
+    height: 14px;
+    background: var(--accent);
+  }
+  .brand-band-bottom { height: 14px; background: var(--accent); }
+  
+  /* Grid paper background */
+  .grid-paper {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(to right, rgba(0,163,233,0.10) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,163,233,0.10) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .grid-paper-light {
+    background-color: #F0F8FE;
+    background-image:
+      linear-gradient(to right, rgba(0,163,233,0.18) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,163,233,0.18) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Top fixed-style header inside designed top */
+  .designed-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 40px;
+    background: transparent;
+    position: relative;
+    z-index: 5;
+  }
+  .designed-logo {
+    font-size: 24px; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+  .designed-nav {
+    display: flex; gap: 36px; font-size: 13px;
+    color: var(--ink);
+    align-items: center;
+  }
+  .designed-nav a { color: inherit; }
+  .designed-line-btn {
+    background: #06c755; color: white;
+    padding: 10px 28px;
+    border-radius: 6px;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  /* Hero (designed) */
+  .designed-hero {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 24px 40px 48px;
+    align-items: start;
+  }
+  .designed-hero-left { padding-top: 24px; padding-left: 16px; }
+  .designed-hero-title {
+    font-size: 56px; font-weight: 400;
+    line-height: 1.45; letter-spacing: 0.03em;
+    color: var(--ink);
+    margin-bottom: 36px;
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+  }
+  .designed-hero-title em {
+    color: var(--accent); font-style: normal; font-weight: 500;
+  }
+  .designed-hero-sub {
+    font-size: 14px; line-height: 2.0;
+    color: var(--ink-mute);
+    margin-bottom: 40px;
+  }
+  .designed-hero-cta {
+    display: flex; gap: 16px;
+  }
+  .designed-btn-line {
+    background: #06c755; color: white;
+    padding: 14px 36px; border-radius: 999px;
+    font-size: 14px; font-weight: 500;
+  }
+  .designed-btn-primary {
+    background: var(--accent-deep); color: white;
+    padding: 14px 36px; border-radius: 999px;
+    font-size: 14px; font-weight: 500;
+  }
+  .designed-hero-right {
+    position: relative;
+  }
+  .designed-hero-img {
+    width: 100%; aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #d4d1c8, #a8a59c);
+    border-radius: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* &S circular stamp */
+  .stamp-circle {
+    position: absolute;
+    top: 30px; right: 30px;
+    width: 130px; height: 130px;
+    z-index: 3;
+    color: var(--accent-deep);
+  }
+  .stamp-circle svg { width: 100%; height: 100%; }
+  
+  /* PICK UP card overlay on hero */
+  .hero-pickup-card {
+    position: absolute;
+    bottom: -20px; right: -20px;
+    background: var(--accent-deep);
+    color: white;
+    padding: 14px 16px;
+    width: 200px;
+    z-index: 4;
+    display: flex; gap: 12px; align-items: stretch;
+  }
+  .hero-pickup-card-thumb {
+    width: 60px; height: 60px;
+    background: #d4d1c8;
+    flex-shrink: 0;
+  }
+  .hero-pickup-card-body { flex: 1; }
+  .hero-pickup-card-label {
+    font-size: 9px; letter-spacing: 0.2em; opacity: 0.85;
+    margin-bottom: 4px;
+  }
+  .hero-pickup-card-title {
+    font-size: 11px; line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .hero-pickup-card-date {
+    font-size: 10px; opacity: 0.7;
+  }
+  
+  /* Big rolling text band */
+  .roll-band {
+    background: var(--paper);
+    padding: 32px 0 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  .roll-text {
+    font-size: 92px; font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    display: flex;
+    gap: 60px;
+    animation: rollLeft 30s linear infinite;
+  }
+  .roll-text > span:nth-child(2n) {
+    color: var(--accent-deep);
+  }
+  @keyframes rollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  /* Round badges */
+  .round-badge {
+    width: 130px; height: 130px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-deep);
+    position: relative;
+  }
+  .round-badge svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+  .round-badge-text {
+    font-family: 'Zen Kaku Gothic New', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--accent-deep);
+    z-index: 2;
+  }
+  
+  /* Section labels (dashed pill) */
+  .designed-label {
+    display: inline-block;
+    border: 1.5px dashed var(--accent-deep);
+    color: var(--accent-deep);
+    padding: 6px 22px;
+    border-radius: 999px;
+    font-size: 11px; letter-spacing: 0.25em;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .designed-section-title {
+    font-size: 28px; font-weight: 500; color: var(--ink);
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+  .designed-section-sub {
+    font-size: 13px; color: var(--ink-mute);
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  /* Latest articles - rounded card style */
+  .designed-articles-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 0 40px;
+  }
+  .designed-article-card { display: block; }
+  .designed-article-thumb {
+    width: 100%; aspect-ratio: 4/3;
+    background: #d4d1c8;
+    border-radius: 18px;
+    margin-bottom: 14px;
+  }
+  .designed-article-tags { display: flex; gap: 6px; margin-bottom: 10px; }
+  .designed-article-tag {
+    border: 1.5px solid var(--accent-deep);
+    color: var(--accent-deep);
+    padding: 3px 14px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 500;
+  }
+  .designed-article-title {
+    font-size: 15px; font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .designed-article-desc {
+    font-size: 12px; color: var(--ink-mute);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .designed-article-meta {
+    font-size: 11px; color: var(--ink-light);
+  }
+
+  .designed-cta-btn-center {
+    display: block; width: fit-content;
+    margin: 48px auto 0;
+    background: var(--accent-deep); color: white;
+    padding: 14px 40px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+  }
+
+  /* Pickup section (Sato Aiou-style large card with dashed frame) */
+  .designed-pickup-wrap {
+    background: var(--paper);
+    padding: 56px 40px 80px;
+    position: relative;
+  }
+  .designed-pickup-card {
+    border: 1.5px dashed var(--accent-deep);
+    border-radius: 0;
+    padding: 18px;
+    display: grid; grid-template-columns: 280px 1fr;
+    gap: 28px; align-items: center;
+    position: relative;
+  }
+  .designed-pickup-tag-vertical {
+    position: absolute;
+    left: -1.5px; top: 32px;
+    background: var(--accent-deep);
+    color: white;
+    padding: 14px 6px;
+    font-size: 11px; letter-spacing: 0.3em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  .designed-pickup-img {
+    width: 100%; aspect-ratio: 1;
+    background: linear-gradient(135deg, #c8c5bc, #969085);
+    border-radius: 18px;
+  }
+  .designed-pickup-body { padding-right: 16px; }
+  .designed-pickup-tags { display: flex; gap: 6px; margin-bottom: 14px; }
+  .designed-pickup-title {
+    font-size: 22px; font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .designed-pickup-desc {
+    font-size: 13px; color: var(--ink-mute);
+    line-height: 1.95;
+    margin-bottom: 16px;
+  }
+  .designed-pickup-meta {
+    font-size: 11px; color: var(--ink-light);
+  }
+  .designed-pickup-arrow {
+    position: absolute;
+    bottom: 14px; right: 14px;
+    width: 32px; height: 32px;
+    background: var(--accent-deep);
+    border-radius: 50%;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* Reporters section */
+  .designed-reporters-circles {
+    display: flex; justify-content: center;
+    gap: 22px; padding: 0 40px;
+    margin-bottom: 48px; flex-wrap: wrap;
+  }
+  .designed-reporter-bubble {
+    width: 130px;
+    text-align: center;
+  }
+  .designed-reporter-bubble-img {
+    width: 130px; height: 130px;
+    border: 1.5px dashed var(--accent-deep);
+    border-radius: 50%;
+    background: #d4d1c8;
+    margin-bottom: 10px;
+  }
+  .designed-reporter-bubble-name {
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .designed-reporter-bubble-school {
+    font-size: 10px; color: var(--ink-mute);
+    line-height: 1.5;
+  }
+  
+  /* Reporter ticker */
+  .reporter-ticker {
+    background: var(--paper);
+    padding: 16px 0;
+    overflow: hidden;
+    border-top: 1px dashed rgba(12, 68, 124, 0.3);
+    border-bottom: 1px dashed rgba(12, 68, 124, 0.3);
+    margin: 32px 0;
+  }
+  .reporter-ticker-track {
+    display: flex; gap: 60px;
+    animation: rollLeft 40s linear infinite;
+    white-space: nowrap;
+  }
+  .reporter-ticker-item {
+    display: inline-flex; align-items: baseline; gap: 14px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .reporter-ticker-item-school {
+    font-size: 12px; color: var(--ink-mute);
+  }
+
+  /* Recruit banner */
+  .designed-recruit-banner {
+    background: var(--accent-deep);
+    border-radius: 12px;
+    color: white;
+    padding: 24px 32px;
+    margin: 0 40px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 20px; flex-wrap: wrap;
+  }
+  .designed-recruit-banner-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .designed-recruit-banner-body { flex: 1; }
+  .designed-recruit-banner-title {
+    font-size: 17px; font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .designed-recruit-banner-sub {
+    font-size: 12px; opacity: 0.85;
+  }
+  .designed-recruit-btn {
+    background: white; color: var(--accent-deep);
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+  }
+
+  /* Themes block (light blue grid) */
+  .designed-themes-block {
+    padding: 64px 40px;
+    background: #E5F2FB;
+    background-image:
+      linear-gradient(to right, rgba(0,163,233,0.18) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,163,233,0.18) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .designed-themes-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .designed-theme-tile {
+    background: white;
+    padding: 24px 8px;
+    text-align: center;
+    border-radius: 4px;
+  }
+  .designed-theme-tile-name {
+    font-size: 15px; font-weight: 500;
+    margin-bottom: 8px;
+    border-bottom: 2px solid var(--accent-deep);
+    display: inline-block;
+    padding-bottom: 4px;
+  }
+  .designed-theme-tile-count {
+    font-size: 11px; color: var(--ink-mute);
+    margin-top: 12px;
+  }
+
+  /* News block */
+  .designed-news-block {
+    padding: 80px 40px;
+    background: var(--paper);
+  }
+  .designed-news-list {
+    max-width: 880px; margin: 0 auto;
+  }
+  .designed-news-item {
+    display: grid;
+    grid-template-columns: 100px 130px 1fr 32px;
+    gap: 24px; align-items: center;
+    padding: 18px 0;
+    border-left: 3px solid var(--accent-deep);
+    padding-left: 20px;
+    margin-bottom: 8px;
+  }
+  .designed-news-date {
+    font-size: 13px; color: var(--ink); font-weight: 500;
+  }
+  .designed-news-tag {
+    border: 1.5px solid var(--accent-deep);
+    color: var(--accent-deep);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 10px; font-weight: 500;
+    text-align: center; white-space: nowrap;
+  }
+  .designed-news-tag-purple { border-color: #534AB7; color: #534AB7; }
+  .designed-news-tag-amber { border-color: #BA7517; color: #BA7517; }
+  .designed-news-title {
+    font-size: 14px; color: var(--ink); line-height: 1.7;
+  }
+  .designed-news-arrow {
+    width: 28px; height: 28px;
+    background: var(--accent-deep);
+    border-radius: 50%;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+
+  /* Related sites */
+  .designed-related-block {
+    padding: 56px 40px 80px;
+    background: #E5F2FB;
+    background-image:
+      linear-gradient(to right, rgba(0,163,233,0.18) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,163,233,0.18) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .designed-related-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .designed-related-card {
+    background: white;
+    border: 1.5px dashed var(--accent-deep);
+    border-radius: 8px;
+    padding: 24px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px;
+  }
+  .designed-related-card-name {
+    font-size: 17px; font-weight: 500; color: var(--accent-deep);
+    margin-bottom: 6px;
+  }
+  .designed-related-card-desc {
+    font-size: 12px; color: var(--ink-mute);
+  }
+  .designed-related-card-icon {
+    width: 36px; height: 36px;
+    background: var(--accent-deep);
+    border-radius: 50%;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  /* LINE banner */
+  .designed-line-block {
+    padding: 80px 40px;
+    background: var(--paper);
+    text-align: center;
+  }
+  .designed-line-icon {
+    width: 60px; height: 60px;
+    background: #06c755;
+    border-radius: 18px;
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 28px; font-weight: 700;
+  }
+  .designed-line-heading {
+    font-size: 28px; font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .designed-line-sub {
+    font-size: 13px; color: var(--ink-mute);
+    margin-bottom: 28px;
+  }
+  .designed-line-btn-large {
+    display: inline-block;
+    background: #06c755; color: white;
+    padding: 16px 56px;
+    border-radius: 999px;
+    font-size: 14px; font-weight: 500;
+  }
+
+  /* Footer (designed) */
+  .designed-footer {
+    background: #8BA0AE;
+    color: white;
+    padding: 56px 40px 24px;
+  }
+  .designed-footer-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 3fr;
+    gap: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+  .designed-footer-logo {
+    font-size: 32px; font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+  }
+  .designed-footer-tag {
+    font-size: 12px; line-height: 1.95;
+    color: rgba(255,255,255,0.95);
+  }
+  .designed-footer-cols {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .designed-footer-col-label {
+    display: inline-block;
+    border: 1px dashed rgba(255,255,255,0.6);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 10px; letter-spacing: 0.2em;
+    margin-bottom: 12px;
+  }
+  .designed-footer-link {
+    display: block;
+    font-size: 12px;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .designed-footer-bottom {
+    max-width: 1100px; margin: 24px auto 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* Mobile fallback */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar {
+      position: relative;
+      height: auto;
+      padding: 20px;
+    }
+    .designed-hero { grid-template-columns: 1fr; padding: 24px 24px 48px; }
+    .designed-hero-title { font-size: 36px; }
+    .designed-articles-row { grid-template-columns: 1fr; }
+    .designed-pickup-card { grid-template-columns: 1fr; }
+    .designed-themes-row { grid-template-columns: repeat(2, 1fr); }
+    .designed-news-item { grid-template-columns: 80px 1fr 24px; gap: 12px; }
+    .designed-news-tag { display: none; }
+    .designed-related-row { grid-template-columns: 1fr; }
+    .designed-footer-inner { grid-template-columns: 1fr; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ===== Sidebar (Career edit-style global navigation) ===== -->
+<aside class="sidebar">
+  <div class="sidebar-brand">TSUNAGARU SAGA</div>
+  <div class="sidebar-tagline">— Site mockup v2 —</div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">MAIN PAGES</div>
+    <a class="sidebar-link active" data-target="top-page">ホーム</a>
+    <a class="sidebar-link" data-target="about-page">つながるさがとは</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">ARTICLES</div>
+    <a class="sidebar-link" data-target="archive-page">記事一覧</a>
+    <a class="sidebar-link" data-target="feature-page">特集記事 ／ 例</a>
+    <a class="sidebar-link" data-target="article-page">通常記事 ／ 例</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">REPORTERS</div>
+    <a class="sidebar-link" data-target="reporters-page">学生記者 紹介</a>
+    <a class="sidebar-link" data-target="recruit-page">学生記者 募集</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">INFORMATION</div>
+    <a class="sidebar-link" data-target="event-page">佐賀県からのおしらせ</a>
+  </div>
+
+  <div class="sidebar-bottom">
+    PROTOTYPE<br>
+    構成確認用モック<br><br>
+    運営：佐賀県産業人材課
+  </div>
+</aside>
+
+<!-- ===== Canvas (page content) ===== -->
+<div class="canvas">
+
+
+<!-- ===== Sticky Header ===== -->
+<header class="site-header">
+  <div class="nav-wrap">
+    <div class="nav-left">
+      <a href="#about-page">つながるさがとは</a>
+      <a href="#article-page">記事を読む</a>
+      <a href="#reporters-page">学生記者</a>
+    </div>
+    <div class="nav-logo">
+      <div class="nav-logo-en">TSUNAGARU SAGA</div>
+      <div class="nav-logo-jp">つながるさが</div>
+    </div>
+    <div class="nav-right">
+      <a href="#event-page">おしらせ</a>
+      <a href="#recruit-page">記者になる</a>
+      <a href="#" class="btn-line-text" style="color:#06c755">LINE登録</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- ===== TOP PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="top-page" class="active">
+
+<div class="designed-top-wrap">
+
+<!-- Top brand band -->
+<div class="brand-band"></div>
+
+<!-- Designed header -->
+<header class="designed-header grid-paper">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="designed-hero grid-paper">
+  <div class="designed-hero-left">
+    <h1 class="designed-hero-title">外に出たからこそ<br>はじまる<br><em>佐賀</em>との<em>関係</em></h1>
+    <p class="designed-hero-sub">
+      福岡で、大阪で、東京で、はたまた、それ以外のどこかで。<br>
+      新しい毎日のなかにいる君へ、ここでしか読めない佐賀の話を、お届けします。
+    </p>
+    <div class="designed-hero-cta">
+      <a href="#" class="designed-btn-line">LINEでつながる</a>
+      <a href="#archive-page" class="designed-btn-primary">記事を読む</a>
+    </div>
+  </div>
+  <div class="designed-hero-right">
+    <div class="designed-hero-img">ヒーロー画像／佐賀を出た学生（街を歩く女性）</div>
+    
+    <!-- &S circular stamp -->
+    <div class="stamp-circle">
+      <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="circlePath" d="M 65,65 m -52,0 a 52,52 0 1,1 104,0 a 52,52 0 1,1 -104,0" fill="none"/>
+        </defs>
+        <circle cx="65" cy="65" r="60" fill="none" stroke="#0c447c" stroke-width="1.5"/>
+        <circle cx="65" cy="65" r="48" fill="none" stroke="#0c447c" stroke-width="1.5"/>
+        <text font-family="sans-serif" font-size="9" letter-spacing="2" fill="#0c447c">
+          <textPath href="#circlePath" startOffset="0">TSUNAGARU SAGA · TSUNAGARU SAGA · </textPath>
+        </text>
+        <text x="65" y="76" text-anchor="middle" font-size="34" font-weight="700" fill="#0c447c" font-family="sans-serif">&amp;S</text>
+      </svg>
+    </div>
+    
+    <!-- PICK UP overlay card -->
+    <div class="hero-pickup-card">
+      <div class="hero-pickup-card-thumb"></div>
+      <div class="hero-pickup-card-body">
+        <div class="hero-pickup-card-label">PICK UP</div>
+        <div class="hero-pickup-card-title">日本一有名な「佐賀ちゃん」と巡る、佐賀の街の楽しみ方…</div>
+        <div class="hero-pickup-card-date">2026.10.15</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Rolling text band -->
+<div class="roll-band">
+  <div class="roll-text">
+    <span>TSUNAGARU SAGA ・</span>
+    <span>TSUNAGARU SAGA ・</span>
+    <span>TSUNAGARU SAGA ・</span>
+    <span>TSUNAGARU SAGA ・</span>
+    <span>TSUNAGARU SAGA ・</span>
+    <span>TSUNAGARU SAGA ・</span>
+  </div>
+</div>
+
+<!-- Latest articles -->
+<section class="grid-paper" style="padding: 48px 0 96px; position: relative;">
+  
+  <!-- Round "New" badge floating -->
+  <div style="position: absolute; left: 40px; top: 0;">
+    <div class="round-badge">
+      <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="newCirclePath" d="M 65,65 m -52,0 a 52,52 0 1,1 104,0 a 52,52 0 1,1 -104,0" fill="none"/>
+        </defs>
+        <circle cx="65" cy="65" r="60" fill="none" stroke="#0c447c" stroke-width="1.5"/>
+        <circle cx="65" cy="65" r="48" fill="none" stroke="#0c447c" stroke-width="1.5"/>
+        <text font-family="sans-serif" font-size="9" letter-spacing="2" fill="#0c447c">
+          <textPath href="#newCirclePath" startOffset="0">TSUNAGARU SAGA · TSUNAGARU SAGA · </textPath>
+        </text>
+      </svg>
+      <div class="round-badge-text">New</div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-bottom: 48px;">
+    <div class="designed-label">LATEST</div>
+    <h2 class="designed-section-title">最新の記事</h2>
+  </div>
+  
+  <div class="designed-articles-row">
+    <a href="#feature-page" class="designed-article-card article-card-link">
+      <div class="designed-article-thumb"></div>
+      <div class="designed-article-tags">
+        <span class="designed-article-tag">制度</span>
+        <span class="designed-article-tag">学生記者</span>
+      </div>
+      <h4 class="designed-article-title">【調べてみた】佐賀県には奨学金返還支援制度というのがあるらしい</h4>
+      <p class="designed-article-desc">岡山大2年・鹿島出身の学生記者が、自分が将来使うかもしれない制度を、ちゃんと調べてみました。</p>
+      <div class="designed-article-meta">2027.03.15 ・ 13min read</div>
+    </a>
+    <a href="#article-page" class="designed-article-card article-card-link">
+      <div class="designed-article-thumb"></div>
+      <div class="designed-article-tags">
+        <span class="designed-article-tag">暮らし</span>
+        <span class="designed-article-tag">学生記者</span>
+      </div>
+      <h4 class="designed-article-title">サガシル福岡で見えた、出身者も知らなかった佐賀</h4>
+      <p class="designed-article-desc">九大2年・佐賀市出身の学生記者が、福岡で開催される佐賀のイベントに参加してきました。</p>
+      <div class="designed-article-meta">2027.02.18 ・ 7min read</div>
+    </a>
+    <a href="#article-page" class="designed-article-card article-card-link">
+      <div class="designed-article-thumb"></div>
+      <div class="designed-article-tags">
+        <span class="designed-article-tag">しごと</span>
+        <span class="designed-article-tag">学生記者</span>
+      </div>
+      <h4 class="designed-article-title">【現地レポ】東京で開催された「佐賀の暮らし＆しごと」フェアに行ってきた</h4>
+      <p class="designed-article-desc">芝浦工大2年の学生記者が、東京・有楽町で開かれた佐賀の体感フェアを工学の目で取材。</p>
+      <div class="designed-article-meta">2027.01.20 ・ 6min read</div>
+    </a>
+  </div>
+
+  <a href="#archive-page" class="designed-cta-btn-center">記事をすべて見る</a>
+</section>
+
+<!-- Pickup section (Sato Aiou) -->
+<section class="designed-pickup-wrap grid-paper">
+  <a href="#article-page" class="designed-pickup-card article-card-link">
+    <div class="designed-pickup-tag-vertical">PICK UP</div>
+    <div class="designed-pickup-img">取材カット／佐藤愛桜</div>
+    <div class="designed-pickup-body">
+      <div class="designed-pickup-tags">
+        <span class="designed-article-tag">カルチャー</span>
+        <span class="designed-article-tag">編集部</span>
+      </div>
+      <h3 class="designed-pickup-title">【佐賀出身】櫻坂46佐藤愛桜が語る地元の思い出</h3>
+      <p class="designed-pickup-desc">坂道シリーズ初の佐賀県出身メンバーとして櫻坂46に加入した、佐藤愛桜さん。中学時代から佐賀⇄東京を行き来して活動してきた彼女に、編集部が、佐賀での日々と、いまに続く想いを聞きました。</p>
+      <div class="designed-pickup-meta">2026.11.30 ・ 10min read<br>by つながるさが編集部</div>
+    </div>
+    <div class="designed-pickup-arrow">↗</div>
+  </a>
+</section>
+
+<!-- Reporters -->
+<section class="grid-paper" style="padding: 80px 0; position: relative;">
+
+  <!-- Round REPORTERS badge floating right -->
+  <div style="position: absolute; right: 40px; top: 80px;">
+    <div class="round-badge">
+      <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="reporterCirclePath" d="M 65,65 m -52,0 a 52,52 0 1,1 104,0 a 52,52 0 1,1 -104,0" fill="none"/>
+        </defs>
+        <circle cx="65" cy="65" r="60" fill="none" stroke="#0c447c" stroke-width="1.5"/>
+        <circle cx="65" cy="65" r="48" fill="none" stroke="#0c447c" stroke-width="1.5"/>
+        <text font-family="sans-serif" font-size="9" letter-spacing="2" fill="#0c447c">
+          <textPath href="#reporterCirclePath" startOffset="0">TSUNAGARU SAGA · TSUNAGARU SAGA · </textPath>
+        </text>
+        <g transform="translate(57, 50)" stroke="#0c447c" stroke-width="2" fill="none">
+          <path d="M 0 0 L 8 -8 L 14 -2 L 6 6 Z"/>
+          <path d="M 6 6 L 0 30"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div class="designed-label">REPORTERS</div>
+    <h2 class="designed-section-title">書いている人たち</h2>
+    <p class="designed-section-sub">佐賀を出た学生が、それぞれの場所から、佐賀を取材しています。</p>
+  </div>
+
+  <div class="designed-reporters-circles">
+    <div class="designed-reporter-bubble">
+      <div class="designed-reporter-bubble-img"></div>
+      <div class="designed-reporter-bubble-name">古賀 蒼</div>
+      <div class="designed-reporter-bubble-school">早稲田大／東京</div>
+    </div>
+    <div class="designed-reporter-bubble">
+      <div class="designed-reporter-bubble-img"></div>
+      <div class="designed-reporter-bubble-name">松尾 海斗</div>
+      <div class="designed-reporter-bubble-school">芝浦工大／東京</div>
+    </div>
+    <div class="designed-reporter-bubble">
+      <div class="designed-reporter-bubble-img"></div>
+      <div class="designed-reporter-bubble-name">中島 莉子</div>
+      <div class="designed-reporter-bubble-school">立命館大／京都</div>
+    </div>
+    <div class="designed-reporter-bubble">
+      <div class="designed-reporter-bubble-img"></div>
+      <div class="designed-reporter-bubble-name">副島 智樹</div>
+      <div class="designed-reporter-bubble-school">岡山大／岡山</div>
+    </div>
+    <div class="designed-reporter-bubble">
+      <div class="designed-reporter-bubble-img"></div>
+      <div class="designed-reporter-bubble-name">江口 葉月</div>
+      <div class="designed-reporter-bubble-school">龍谷大／京都</div>
+    </div>
+    <div class="designed-reporter-bubble">
+      <div class="designed-reporter-bubble-img"></div>
+      <div class="designed-reporter-bubble-name">池田 拓海</div>
+      <div class="designed-reporter-bubble-school">九州大／福岡</div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-bottom: 56px;">
+    <a href="#reporters-page" class="designed-cta-btn-center" style="margin-top: 0;">記者全員を見る</a>
+  </div>
+
+  <!-- Reporter ticker -->
+  <div class="reporter-ticker">
+    <div class="reporter-ticker-track">
+      <span class="reporter-ticker-item"><span>古賀 蒼</span><span class="reporter-ticker-item-school">早稲田大／東京</span></span>
+      <span class="reporter-ticker-item"><span>松尾 海斗</span><span class="reporter-ticker-item-school">芝浦工大／東京</span></span>
+      <span class="reporter-ticker-item"><span>中島 莉子</span><span class="reporter-ticker-item-school">立命館大／京都</span></span>
+      <span class="reporter-ticker-item"><span>副島 智樹</span><span class="reporter-ticker-item-school">岡山大／岡山</span></span>
+      <span class="reporter-ticker-item"><span>江口 葉月</span><span class="reporter-ticker-item-school">龍谷大／京都</span></span>
+      <span class="reporter-ticker-item"><span>池田 拓海</span><span class="reporter-ticker-item-school">九州大／福岡</span></span>
+      <span class="reporter-ticker-item"><span>古賀 蒼</span><span class="reporter-ticker-item-school">早稲田大／東京</span></span>
+      <span class="reporter-ticker-item"><span>松尾 海斗</span><span class="reporter-ticker-item-school">芝浦工大／東京</span></span>
+      <span class="reporter-ticker-item"><span>中島 莉子</span><span class="reporter-ticker-item-school">立命館大／京都</span></span>
+      <span class="reporter-ticker-item"><span>副島 智樹</span><span class="reporter-ticker-item-school">岡山大／岡山</span></span>
+      <span class="reporter-ticker-item"><span>江口 葉月</span><span class="reporter-ticker-item-school">龍谷大／京都</span></span>
+      <span class="reporter-ticker-item"><span>池田 拓海</span><span class="reporter-ticker-item-school">九州大／福岡</span></span>
+    </div>
+  </div>
+
+  <!-- Recruit banner -->
+  <div class="designed-recruit-banner">
+    <div class="designed-recruit-banner-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M3 19 L8 14 L17 5 L18 6 L9 15 L4 20 Z" stroke="white" stroke-width="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="designed-recruit-banner-body">
+      <div class="designed-recruit-banner-title">あなたも、学生記者になりませんか？</div>
+      <div class="designed-recruit-banner-sub">取材で帰省するときの交通費は、こちらで負担します。</div>
+    </div>
+    <a href="#recruit-page" class="designed-recruit-btn">プログラムを見る</a>
+  </div>
+</section>
+
+<!-- Themes -->
+<section class="designed-themes-block">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div class="designed-label">BY THEME</div>
+    <h2 class="designed-section-title">テーマから探す</h2>
+    <p class="designed-section-sub">気になるテーマから、記事を探せます。</p>
+  </div>
+  <div class="designed-themes-row">
+    <a href="#archive-page" class="designed-theme-tile">
+      <div class="designed-theme-tile-name">しごと</div>
+      <div class="designed-theme-tile-count">2 articles</div>
+    </a>
+    <a href="#archive-page" class="designed-theme-tile">
+      <div class="designed-theme-tile-name">暮らし</div>
+      <div class="designed-theme-tile-count">1 article</div>
+    </a>
+    <a href="#archive-page" class="designed-theme-tile">
+      <div class="designed-theme-tile-name">グルメ</div>
+      <div class="designed-theme-tile-count">1 article</div>
+    </a>
+    <a href="#archive-page" class="designed-theme-tile">
+      <div class="designed-theme-tile-name">カルチャー</div>
+      <div class="designed-theme-tile-count">1 article</div>
+    </a>
+    <a href="#archive-page" class="designed-theme-tile">
+      <div class="designed-theme-tile-name">制度</div>
+      <div class="designed-theme-tile-count">1 article</div>
+    </a>
+    <a href="#archive-page" class="designed-theme-tile">
+      <div class="designed-theme-tile-name">すべて</div>
+      <div class="designed-theme-tile-count">6 articles</div>
+    </a>
+  </div>
+</section>
+
+<!-- News -->
+<section class="designed-news-block grid-paper">
+  <div style="text-align: center; margin-bottom: 48px;">
+    <div class="designed-label">NEWS</div>
+    <h2 class="designed-section-title">佐賀県からのおしらせ</h2>
+    <p class="designed-section-sub">イベントやキャンペーンなど、佐賀県からのご案内です。</p>
+  </div>
+  <div class="designed-news-list">
+    <a href="#event-page" class="designed-news-item">
+      <div class="designed-news-date">2026.10.01</div>
+      <div class="designed-news-tag">サイト</div>
+      <div class="designed-news-title">「つながるさが」公開のお知らせ</div>
+      <div class="designed-news-arrow">↗</div>
+    </a>
+    <a href="#event-page" class="designed-news-item">
+      <div class="designed-news-date">2026.12.13</div>
+      <div class="designed-news-tag designed-news-tag-purple">イベント・東京</div>
+      <div class="designed-news-title">佐賀さいこう！暮らし＆しごと体感フェア 開催</div>
+      <div class="designed-news-arrow">↗</div>
+    </a>
+    <a href="#event-page" class="designed-news-item">
+      <div class="designed-news-date">2026.12.15</div>
+      <div class="designed-news-tag designed-news-tag-amber">プレゼント</div>
+      <div class="designed-news-title">LINE登録者限定 佐賀牛プレゼントキャンペーン</div>
+      <div class="designed-news-arrow">↗</div>
+    </a>
+    <a href="#event-page" class="designed-news-item">
+      <div class="designed-news-date">2027.01-02月</div>
+      <div class="designed-news-tag designed-news-tag-purple">イベント・福岡</div>
+      <div class="designed-news-title">さがを深く知る交流会「サガシル福岡」 開催</div>
+      <div class="designed-news-arrow">↗</div>
+    </a>
+    <a href="#event-page" class="designed-news-item">
+      <div class="designed-news-date">通年</div>
+      <div class="designed-news-tag">制度</div>
+      <div class="designed-news-title">UJIターン就職活動交通費支援事業のご案内</div>
+      <div class="designed-news-arrow">↗</div>
+    </a>
+    <a href="#event-page" class="designed-news-item">
+      <div class="designed-news-date">通年</div>
+      <div class="designed-news-tag">制度</div>
+      <div class="designed-news-title">奨学金返還支援事業のご案内</div>
+      <div class="designed-news-arrow">↗</div>
+    </a>
+  </div>
+  <div style="text-align: center; margin-top: 40px;">
+    <a href="#event-page" class="designed-cta-btn-center" style="margin-top: 0;">おしらせをすべて見る</a>
+  </div>
+</section>
+
+<!-- Related sites -->
+<section class="designed-related-block">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div class="designed-label">RELATED</div>
+    <h2 class="designed-section-title">関連サイト</h2>
+  </div>
+  <div class="designed-related-row">
+    <a href="https://ss.saga-job.jp/" target="_blank" rel="noopener" class="designed-related-card">
+      <div>
+        <div class="designed-related-card-name">さがジョブナビ</div>
+        <div class="designed-related-card-desc">佐賀の企業や求人がまとまった、佐賀県公式サイト。</div>
+      </div>
+      <div class="designed-related-card-icon">↗</div>
+    </a>
+    <a href="https://ss.saga-job.jp/scholarship/" target="_blank" rel="noopener" class="designed-related-card">
+      <div>
+        <div class="designed-related-card-name">奨学金返還支援事業</div>
+        <div class="designed-related-card-desc">佐賀で働く若い人の奨学金返還を支援する制度。</div>
+      </div>
+      <div class="designed-related-card-icon">↗</div>
+    </a>
+  </div>
+</section>
+
+<!-- LINE block -->
+<section class="designed-line-block grid-paper">
+  <div class="designed-line-icon">L</div>
+  <h2 class="designed-line-heading">LINEで、つながりましょう。</h2>
+  <p class="designed-line-sub">新しい記事や佐賀のお知らせを、月2回ほどLINEでお届けします。</p>
+  <a href="#" class="designed-line-btn-large">友だち追加する</a>
+</section>
+
+<!-- Designed footer -->
+<footer class="designed-footer">
+  <div class="designed-footer-inner">
+    <div>
+      <div class="designed-footer-logo">&amp;SAGA</div>
+      <p class="designed-footer-tag">佐賀を出た学生のための、佐賀のメディア。<br>あの頃気づけなかった佐賀の魅力を、同世代の言葉で。</p>
+    </div>
+    <div class="designed-footer-cols">
+      <div>
+        <div class="designed-footer-col-label">読む</div>
+        <a href="#archive-page" class="designed-footer-link">記事一覧</a>
+        <a href="#feature-page" class="designed-footer-link">特集記事</a>
+        <a href="#archive-page" class="designed-footer-link">テーマから探す</a>
+      </div>
+      <div>
+        <div class="designed-footer-col-label">学生記者</div>
+        <a href="#reporters-page" class="designed-footer-link">記者紹介</a>
+        <a href="#recruit-page" class="designed-footer-link">学生記者になる</a>
+        <a href="#event-page" class="designed-footer-link">イベント情報</a>
+      </div>
+      <div>
+        <div class="designed-footer-col-label">関連サイト</div>
+        <a href="https://ss.saga-job.jp/" class="designed-footer-link">さがジョブナビ ↗</a>
+        <a href="https://ss.saga-job.jp/scholarship/" class="designed-footer-link">奨学金返還支援事業 ↗</a>
+        <a href="#about-page" class="designed-footer-link">このサイトについて</a>
+      </div>
+    </div>
+  </div>
+  <div class="designed-footer-bottom">
+    <div>運営：佐賀県産業人材課 ／ 0952-25-7310</div>
+    <div>© 2026 佐賀県</div>
+  </div>
+</footer>
+
+<!-- Bottom brand band -->
+<div class="brand-band-bottom"></div>
+
+</div><!-- /.designed-top-wrap -->
+
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">ABOUT PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== ABOUT PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="about-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="section-label">ABOUT THIS SITE</div>
+    
+    <div class="statement-block">
+      <h1 class="statement-tagline">
+        外に出たからこそ、<br>
+        はじまる佐賀との<em>関係</em>。
+      </h1>
+      <div class="statement-body">
+        <p>福岡で、大阪で、東京で、<br>はたまた、それ以外のどこかで。<br>新しい毎日のなかにいる君へ、<br>ここでしか読めない佐賀の話を、お届けします。</p>
+
+        <p>食べたことのないあのグルメ、<br>名前だけ知ってるエンタメスポット、<br>とても伸びてる、佐賀の会社。</p>
+
+        <p>少しだけ大人になったいま、<br>面白いと思える佐賀。<br>書いているのは、<br>君のように佐賀を出た同世代。</p>
+
+        <p>いつか帰る人も、そうでない人も。<br>外に出たからこそ、<br>はじまる佐賀との関係。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-warm">
+  <div class="container">
+    <div class="section-label">HOW IT WORKS</div>
+    <h2 class="section-title">サイトの仕組み</h2>
+    <p class="lead" style="color:var(--ink-mute);">記事は、佐賀を出た学生が、自分たちで取材して書いています。</p>
+
+    <div style="margin-top:56px;">
+      <div style="margin-bottom:48px; padding-bottom:32px; border-bottom:1px solid var(--line-faint);">
+        <h4 class="item-title">学生記者プログラム</h4>
+        <p style="color:var(--ink-mute);">佐賀を出た学生が、それぞれの場所から佐賀を取材しています。半年〜1年で交代します。取材で帰省するときの交通費は、プログラムが負担します。</p>
+      </div>
+      <div style="margin-bottom:48px; padding-bottom:32px; border-bottom:1px solid var(--line-faint);">
+        <h4 class="item-title">編集サポート</h4>
+        <p style="color:var(--ink-mute);">学生記者の取材メモから、読みやすい記事になるまで、編集者がサポートしています。生成AIも活用しながら、一人ひとりの言葉のトーンを保ちます。</p>
+      </div>
+      <div>
+        <h4 class="item-title">県既存記事の再構築</h4>
+        <p style="color:var(--ink-mute);">SAGA JOBNAVI MAGAZINEなど、佐賀県が既に発信している記事を、このサイトの世界観に合わせて再構築・転載しています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-label">CONTACT</div>
+    <h2 class="section-title">お問い合わせ</h2>
+    <div style="background:var(--paper-warm); padding:32px; font-size:14px; line-height:2.0; margin-top:32px;">
+      <strong>佐賀県産業人材課</strong><br>
+      〒840-8570 佐賀市城内1丁目1-59<br>
+      TEL：0952-25-7310<br>
+      <span style="color:var(--ink-mute); font-size:12px;">学生記者へのご応募や取材のご依頼は、こちらまで。</span>
+    </div>
+  </div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">FEATURE ARTICLE PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== FEATURE ARTICLE PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="feature-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<section class="feature-hero">
+  <div class="container">
+    <div class="meta">
+      <span class="meta-tag">制度</span>
+    </div>
+    <div class="meta">2027.03.15 ・ 13min read</div>
+    <h1 class="hero-title" style="font-size:36px; margin-bottom:24px;">【調べてみた】佐賀県には奨学金返還支援制度というのがあるらしい</h1>
+    <p class="lead" style="color:var(--ink-mute);">佐賀県には、奨学金返還支援制度というのがあるらしい。岡山大学2年の学生記者が、自分が将来使うかもしれない制度を、ちゃんと調べてみた特集記事です。</p>
+    
+    <div style="display:flex; gap:14px; align-items:center; padding-top:24px; border-top:1px solid var(--line-faint); margin-top:32px;">
+      <div class="img-ph" style="width:48px; height:48px; aspect-ratio:1;">顔</div>
+      <div>
+        <div style="font-size:13px;">学生記者 副島 智樹</div>
+        <div style="font-size:11px; color:var(--ink-light);">岡山大学 理学部 化学科 2年 ／ 鹿島高校卒</div>
+      </div>
+    </div>
+
+    <div class="img-ph img-ph-wide" style="margin-top:48px;">フルワイドヒーロービジュアル</div>
+
+    <div class="feature-toc">
+      <div class="feature-toc-label">CONTENTS</div>
+      <ol class="feature-toc-list">
+        <li>そもそも「奨学金返還支援」って何？</li>
+        <li>書類を集めてみた、現役大学生が</li>
+        <li>振込までのタイムラインを、調べてみた</li>
+        <li>調べてみてわかった、3つのこと</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Chapter 1 -->
+<section class="container">
+  <div class="chapter-num">CHAPTER 01 ／ INTRO</div>
+  <h2 class="section-title">そもそも「奨学金返還支援」って何？</h2>
+
+  <p>こんにちは。岡山大学理学部化学科2年の副島です。鹿島で生まれ育って、岡山に出てきて2年目になります。</p>
+
+  <p>先日、地元・鹿島の同級生と電話していて、「佐賀県、奨学金返還支援っていう制度があるの知ってる？」と聞かれました。正直、初めて聞く制度でした。</p>
+
+  <p>気になって佐賀県のホームページを開いてみたものの、対象企業のリストや要件が細かく書いてあるばかりで、「結局、自分が対象になるのかどうか」が、ぱっとは分からない。</p>
+
+  <p>これ、ちゃんと調べておかないと、いざというときに使えないやつだ。そう思って、岡山の下宿の机で、自分が将来この制度を使うとしたらどうなるのか、いちから調べてみることにしました。</p>
+
+  <div class="data-card">
+    <div class="data-card-label">DATA ／ 制度の概要（県HPより）</div>
+    <div class="data-stats">
+      <div>
+        <div class="data-stat-num">最大150万円</div>
+        <div class="data-stat-label">返還支援額の上限</div>
+      </div>
+      <div>
+        <div class="data-stat-num">5年</div>
+        <div class="data-stat-label">県内定住の要件</div>
+      </div>
+      <div>
+        <div class="data-stat-num">1,200社</div>
+        <div class="data-stat-label">対象となる県内企業数</div>
+      </div>
+    </div>
+  </div>
+
+  <p>結論から言うと、思っていたより、ずっと使える制度でした。そして、思っていたより、知らないことだらけでした。順を追って書いていきます。</p>
+</section>
+
+<!-- Chapter 2 -->
+<section class="section section-warm" style="margin-top:96px;">
+<div class="container">
+  <div class="chapter-num">CHAPTER 02 ／ DOCUMENTS</div>
+  <h2 class="section-title">書類を集めてみた、現役大学生が</h2>
+
+  <div class="img-ph img-ph-wide">本文画像／申請書類のスクリーンショット</div>
+
+  <p>申請には、思った以上の数の書類が必要でした。県のページを見ながら、自分が将来集めるとしたら、どこで何を取らなきゃいけないのかを書き出してみます。</p>
+
+  <div class="checklist">
+    <div class="checklist-label">必要書類チェックリスト</div>
+    <ul>
+      <li>申請書（県HPからダウンロード）</li>
+      <li>在学証明書 or 卒業証明書</li>
+      <li>内定通知書（または雇用契約書）</li>
+      <li>住民票（県内）</li>
+      <li>奨学金の貸与状況証明書（JASSO発行）</li>
+    </ul>
+  </div>
+
+  <p>特に時間がかかりそうなのは、JASSOから発行される「貸与状況証明書」。オンラインで請求してから、手元に届くまで2週間ほどかかるそうです。締切から逆算して動かないと、間に合わなくなる可能性があります。</p>
+</div>
+</section>
+
+<!-- Chapter 3 -->
+<section class="section">
+<div class="container">
+  <div class="chapter-num">CHAPTER 03 ／ TIMELINE</div>
+  <h2 class="section-title">振込までのタイムラインを、調べてみた</h2>
+
+  <p>「申請してから、いつお金が振り込まれるのか」——調べていて、これが一番気になるところでした。県のFAQや過去の利用者ブログを参考に、想定される流れを並べてみます。</p>
+
+  <div class="timeline">
+    <div class="timeline-row">
+      <div class="timeline-day">DAY 1</div>
+      <div class="timeline-event">県HPで制度を知る</div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-day">DAY 7</div>
+      <div class="timeline-event">必要書類を集め始める</div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-day">DAY 21</div>
+      <div class="timeline-event">郵送で申請完了</div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-day">DAY 60</div>
+      <div class="timeline-event">審査結果通知</div>
+    </div>
+    <div class="timeline-row" style="border-color:var(--ink);">
+      <div class="timeline-day" style="color:var(--ink);">DAY 90</div>
+      <div class="timeline-event">指定口座に第1回振込</div>
+    </div>
+  </div>
+
+  <p>制度を知ってから、最初の振込まで、ざっくり3ヶ月。早めに動き始めることが、何よりも大事そうです。</p>
+</div>
+</section>
+
+<!-- Chapter 4 -->
+<section class="section section-warm">
+<div class="container">
+  <div class="chapter-num">CHAPTER 04 ／ TAKEAWAY</div>
+  <h2 class="section-title">調べてみてわかった、3つのこと</h2>
+
+  <p>3日間にわたって調べてみて、自分なりに整理できたことを最後に書きます。</p>
+
+  <p>ひとつめ。<strong>「対象になるなら、絶対に使ったほうがいい」</strong>。返還支援は、5年間でならして最大150万円。学生の生活費に置き換えて考えると、これは小さくない額です。</p>
+
+  <p>ふたつめ。<strong>「知らないだけで、損している人は多そう」</strong>。要件は明確だけど、知っていなければ申請のしようがない。だからこそ、こういう記事が誰かに届けばいい、と思って書いています。</p>
+
+  <p>みっつめ。<strong>「調べる過程で、佐賀との関係が深くなる」</strong>。対象企業を調べたり、県の窓口に問い合わせたりしているうちに、いままで見えていなかった佐賀の側面が、少しずつ見えるようになりました。</p>
+
+  <blockquote>
+    調べはじめは、書類の多さで諦めかけた。でも一度わかってしまえば、思ったほど怖くない。<br>
+    同じく外にいる仲間に伝えたい。これは、知らないと損する制度だ。
+    <span class="by">— 副島 智樹（学生記者）</span>
+  </blockquote>
+</div>
+</section>
+
+<!-- Strong CTA -->
+<section class="feature-cta">
+  <div class="feature-cta-label">この特集で扱った制度</div>
+  <h2>奨学金返還支援事業</h2>
+  <p>この記事は申請の体験談です。実際の対象や申請方法、締切などの最新情報は、佐賀県の公式ページからご確認ください。</p>
+  <a href="https://ss.saga-job.jp/scholarship/" target="_blank" rel="noopener" class="feature-cta-btn">公式ページを見る ↗</a>
+  <div class="feature-cta-url">ss.saga-job.jp/scholarship</div>
+</section>
+
+<!-- Related features -->
+<section class="section">
+<div class="container-wide">
+  <div class="section-label">RELATED FEATURES</div>
+  <h2 class="section-title">この特集を読んだ人におすすめ</h2>
+
+  <div class="articles-row" style="margin-top:48px;">
+    <a href="#feature-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">グルメ</span>
+      </div>
+      <div class="meta">2026.12.20 ・ 12min read</div>
+      <h4 class="item-title">【全力レポート】佐賀ラーメンが進化していた</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">しごと</span>
+      </div>
+      <div class="meta">2026.11.14 ・ 8min read</div>
+      <h4 class="item-title">Uターンで佐賀に戻った先輩に質問をぶつけてみた</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">暮らし</span>
+      </div>
+      <div class="meta">2027.02.18 ・ 7min read</div>
+      <h4 class="item-title">サガシル福岡で見えた、出身者も知らなかった佐賀</h4>
+    </a>
+  </div>
+</div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">REGULAR ARTICLE PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== REGULAR ARTICLE PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="article-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="meta">
+      <span class="meta-tag">しごと</span>
+      <span class="meta-tag" style="background:white;">学生記者</span>
+    </div>
+    <div class="meta">2026.11.14 ・ 8min read</div>
+    <h1 class="hero-title" style="font-size:32px; margin-bottom:24px;">Uターンで佐賀に戻った先輩に質問をぶつけてみた</h1>
+    <p class="lead" style="color:var(--ink-mute);">東京の大学に進学して、就活の時期を迎えました。同期の話は東京・首都圏の企業のことばかり。「佐賀に戻る」という選択肢、実際どうなんだろう。先に決断した先輩に、聞きにいきました。</p>
+
+    <div style="display:flex; gap:14px; align-items:center; padding-top:24px; border-top:1px solid var(--line-faint); margin-top:32px;">
+      <div class="img-ph" style="width:48px; height:48px; aspect-ratio:1;">顔</div>
+      <div>
+        <div style="font-size:13px;">学生記者 古賀 蒼</div>
+        <div style="font-size:11px; color:var(--ink-light);">早稲田大学 商学部 3年 ／ 佐賀西高校卒</div>
+      </div>
+    </div>
+
+    <div class="img-ph img-ph-wide" style="margin-top:48px;">記事ヒーロー画像／取材中の様子</div>
+
+    <p>こんにちは。早稲田大学商学部3年の古賀です。佐賀西高校を卒業して、東京で4年目になります。</p>
+
+    <p>3年生の秋、まわりが就活モードに入ってきました。サークルの先輩、ゼミの同期、みんなが「東京の企業」「外資」「商社」と話している中で、わたしの頭にひとつ、しこりのように残っている問いがありました。</p>
+
+    <p>「佐賀に戻る、っていう選択は、どうなんだろう。」</p>
+
+    <p>東京の生活は楽しい。でも、ふと地元のことを考える瞬間がある。誰に聞いていいかわからないこの問いを、すでに決断した先輩に、ぶつけてみることにしました。</p>
+
+    <h3 class="sub-title" style="margin-top:48px;">取材に応じてくれたのは</h3>
+    <p>東京の私大を卒業して、新卒で東京の企業に2年勤めたあと、Uターンして佐賀の企業に転職した、年齢にして27歳の先輩です。「学生記者の取材」に快く応じてくれました。</p>
+
+    <h3 class="sub-title" style="margin-top:48px;">Q1. なぜUターンを決めたんですか？</h3>
+    <p>「東京で働いていて、楽しかったし、大変なこともあった。けど、なんていうか、自分の足元の感覚がだんだん薄くなる感じがあって。」</p>
+
+    <p>「佐賀に帰るたびに、地元の友達と話したり、実家のごはんを食べたりすると、すごく自分が"そこにいる"気がした。それで、いつか戻る、じゃなくて、そろそろ戻ろう、と思ったんです。」</p>
+
+    <h3 class="sub-title" style="margin-top:48px;">Q2. 仕事は、東京と比べてどうですか？</h3>
+    <p style="color:var(--ink-mute); font-size:13px;">…（記事は続きます。実際の記事では先輩への10問のインタビューを掲載します。）</p>
+
+    <!-- CTA -->
+    <div class="article-cta">
+      <div class="article-cta-label">この記事に関連するサービス</div>
+      <div class="article-cta-q">佐賀での就職や、Uターン就活のサポートは、こちらから。</div>
+      <p class="article-cta-desc">佐賀の企業情報・求人情報・就活交通費補助などは、佐賀県公式の就職情報サイトでご覧いただけます。</p>
+      <a href="https://ss.saga-job.jp/" target="_blank" rel="noopener" class="btn btn-arrow-ext">さがジョブナビ</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-warm">
+<div class="container-wide">
+  <div class="section-label">RELATED</div>
+  <h2 class="section-title">関連する記事</h2>
+
+  <div class="articles-row" style="margin-top:48px;">
+    <a href="#feature-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta"><span class="meta-tag">制度</span></div>
+      <div class="meta">2027.03.15 ・ 13min read</div>
+      <h4 class="item-title">【調べてみた】佐賀県には奨学金返還支援制度というのがあるらしい</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta"><span class="meta-tag">しごと</span></div>
+      <div class="meta">2027.01.20 ・ 6min read</div>
+      <h4 class="item-title">【現地レポ】東京で開催された「佐賀の暮らし＆しごと」フェアに行ってきた</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta"><span class="meta-tag">暮らし</span></div>
+      <div class="meta">2027.02.18 ・ 7min read</div>
+      <h4 class="item-title">サガシル福岡で見えた、出身者も知らなかった佐賀</h4>
+    </a>
+  </div>
+</div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">REPORTERS PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== REPORTERS PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="reporters-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="section-label">REPORTERS</div>
+    <h1 class="hero-title" style="font-size:36px;">書いているのは、<br>君のように佐賀を出た同世代。</h1>
+    <p class="lead" style="color:var(--ink-mute);">佐賀を出た学生が、それぞれの場所から、佐賀を取材しています。学生記者は半年〜1年で交代します。取材で帰省するときの交通費は、こちらで負担します。</p>
+    <div style="margin-top:32px;">
+      <a href="#recruit-page" class="btn btn-arrow">学生記者になる</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-warm">
+<div class="container-wide">
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:32px;">
+    
+    <!-- ① 古賀 蒼 -->
+    <div style="background:white; padding:36px; border:1px solid var(--line);">
+      <div style="display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:24px;">
+        <div class="img-ph" style="aspect-ratio:1;">顔写真</div>
+        <div>
+          <h3 class="sub-title" style="font-size:20px; margin-bottom:6px;">古賀 蒼<span style="font-size:11px; color:var(--ink-light); margin-left:8px; font-weight:400;">こが あおい</span></h3>
+          <div style="font-size:12px; color:var(--ink-mute); margin-bottom:4px;">早稲田大学 商学部 3年</div>
+          <div style="font-size:12px; color:var(--ink-mute);">佐賀西高校 卒業（佐賀市出身）</div>
+        </div>
+      </div>
+      <p style="font-size:14px; line-height:2.0; margin-bottom:24px; padding:18px 20px; background:var(--paper-warm); border-left:3px solid var(--accent);">「帰省するたびに、自分の地元のはずなのに、知らないことばっかり。書きながら、佐賀と付き合い直したいです。」</p>
+      <div style="font-size:11px; letter-spacing:0.15em; color:var(--ink-light); margin-bottom:12px;">3つの質問</div>
+      <div style="font-size:13px; line-height:1.95; margin-bottom:20px;">
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 佐賀で好きな場所は？<br><strong style="color:var(--accent);">A.</strong> 佐賀城公園のお堀沿い。</div>
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 実家に帰ったら必ず食べるものは？<br><strong style="color:var(--accent);">A.</strong> 母のとり天とブラックモンブラン。</div>
+        <div><strong style="color:var(--ink-mute);">Q.</strong> 最近ハマっていることは？<br><strong style="color:var(--accent);">A.</strong> 大学のゼミと、神保町の古本屋巡り。</div>
+      </div>
+      <div style="padding:14px 18px; background:var(--paper-warm); margin-bottom:20px;">
+        <div style="font-size:10px; color:var(--ink-mute); letter-spacing:0.1em; margin-bottom:4px;">記者として</div>
+        <div style="font-size:13px;">ビジネス・キャリア領域。佐賀の働き方やUターンを取材します。</div>
+      </div>
+      <div style="border-top:1px solid var(--line-faint); padding-top:16px;">
+        <div style="font-size:11px; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:10px;">執筆記事</div>
+        <a href="#article-page" style="display:block; font-size:13px; padding:8px 0; line-height:1.6;">Uターンで佐賀に戻った先輩に質問をぶつけてみた<span style="font-size:10px; color:var(--ink-light); margin-left:8px;">2026.11 公開予定</span></a>
+      </div>
+    </div>
+
+    <!-- ② 松尾 海斗 -->
+    <div style="background:white; padding:36px; border:1px solid var(--line);">
+      <div style="display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:24px;">
+        <div class="img-ph" style="aspect-ratio:1;">顔写真</div>
+        <div>
+          <h3 class="sub-title" style="font-size:20px; margin-bottom:6px;">松尾 海斗<span style="font-size:11px; color:var(--ink-light); margin-left:8px; font-weight:400;">まつお かいと</span></h3>
+          <div style="font-size:12px; color:var(--ink-mute); margin-bottom:4px;">芝浦工業大学 工学部 機械工学科 2年</div>
+          <div style="font-size:12px; color:var(--ink-mute);">唐津東高校 卒業（唐津市出身）</div>
+        </div>
+      </div>
+      <p style="font-size:14px; line-height:2.0; margin-bottom:24px; padding:18px 20px; background:var(--paper-warm); border-left:3px solid var(--accent);">「唐津で育ったのに、佐賀市のことはほとんど知りません。県外に出たら、なおのこと。工学の目線で、地元のものづくりを見てみたいです。」</p>
+      <div style="font-size:11px; letter-spacing:0.15em; color:var(--ink-light); margin-bottom:12px;">3つの質問</div>
+      <div style="font-size:13px; line-height:1.95; margin-bottom:20px;">
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 佐賀で好きな場所は？<br><strong style="color:var(--accent);">A.</strong> 唐津城から見下ろす唐津湾の景色。</div>
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 実家に帰ったら必ず食べるものは？<br><strong style="color:var(--accent);">A.</strong> 呼子のイカと、母の肉じゃが。</div>
+        <div><strong style="color:var(--ink-mute);">Q.</strong> 最近ハマっていることは？<br><strong style="color:var(--accent);">A.</strong> 大学のロボコン部と、アニメの聖地巡礼。</div>
+      </div>
+      <div style="padding:14px 18px; background:var(--paper-warm); margin-bottom:20px;">
+        <div style="font-size:10px; color:var(--ink-mute); letter-spacing:0.1em; margin-bottom:4px;">記者として</div>
+        <div style="font-size:13px;">ものづくり・暮らし領域。佐賀の工学・産業の現場を訪ねます。</div>
+      </div>
+      <div style="border-top:1px solid var(--line-faint); padding-top:16px;">
+        <div style="font-size:11px; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:10px;">執筆記事</div>
+        <a href="#article-page" style="display:block; font-size:13px; padding:8px 0; line-height:1.6;">【現地レポ】東京で開催された「佐賀の暮らし＆しごと」フェアに行ってきた<span style="font-size:10px; color:var(--ink-light); margin-left:8px;">2027.01 公開予定</span></a>
+      </div>
+    </div>
+
+    <!-- ③ 中島 莉子 -->
+    <div style="background:white; padding:36px; border:1px solid var(--line);">
+      <div style="display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:24px;">
+        <div class="img-ph" style="aspect-ratio:1;">顔写真</div>
+        <div>
+          <h3 class="sub-title" style="font-size:20px; margin-bottom:6px;">中島 莉子<span style="font-size:11px; color:var(--ink-light); margin-left:8px; font-weight:400;">なかしま りこ</span></h3>
+          <div style="font-size:12px; color:var(--ink-mute); margin-bottom:4px;">立命館大学 産業社会学部 1年</div>
+          <div style="font-size:12px; color:var(--ink-mute);">鳥栖高校 卒業（鳥栖市出身）</div>
+        </div>
+      </div>
+      <p style="font-size:14px; line-height:2.0; margin-bottom:24px; padding:18px 20px; background:var(--paper-warm); border-left:3px solid var(--accent);">「鳥栖で育ったわたしにとって、佐賀って実は遠い存在で。京都に来て、改めて自分のルーツを書いてみたくなりました。」</p>
+      <div style="font-size:11px; letter-spacing:0.15em; color:var(--ink-light); margin-bottom:12px;">3つの質問</div>
+      <div style="font-size:13px; line-height:1.95; margin-bottom:20px;">
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 佐賀で好きな場所は？<br><strong style="color:var(--accent);">A.</strong> サガン鳥栖のスタジアム周辺。地元のシンボル。</div>
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 実家に帰ったら必ず食べるものは？<br><strong style="color:var(--accent);">A.</strong> 高速道路サービスエリアのシシリアンライス。</div>
+        <div><strong style="color:var(--ink-mute);">Q.</strong> 最近ハマっていることは？<br><strong style="color:var(--accent);">A.</strong> 京都の銭湯巡りと、Podcastで深夜のDJ番組を聞くこと。</div>
+      </div>
+      <div style="padding:14px 18px; background:var(--paper-warm); margin-bottom:20px;">
+        <div style="font-size:10px; color:var(--ink-mute); letter-spacing:0.1em; margin-bottom:4px;">記者として</div>
+        <div style="font-size:13px;">メディア・カルチャー領域。佐賀のいまのシーンや若者の文化を取材します。</div>
+      </div>
+      <div style="border-top:1px solid var(--line-faint); padding-top:16px;">
+        <div style="font-size:11px; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:10px;">執筆記事</div>
+        <a href="#article-page" style="display:block; font-size:13px; padding:8px 0; line-height:1.6;">日本一有名な「佐賀ちゃん」と巡る、佐賀の街の楽しみ方<span style="font-size:10px; color:var(--ink-light); margin-left:8px;">2026.10 公開済</span></a>
+      </div>
+    </div>
+
+    <!-- ④ 副島 智樹 -->
+    <div style="background:white; padding:36px; border:1px solid var(--line);">
+      <div style="display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:24px;">
+        <div class="img-ph" style="aspect-ratio:1;">顔写真</div>
+        <div>
+          <h3 class="sub-title" style="font-size:20px; margin-bottom:6px;">副島 智樹<span style="font-size:11px; color:var(--ink-light); margin-left:8px; font-weight:400;">そえじま ともき</span></h3>
+          <div style="font-size:12px; color:var(--ink-mute); margin-bottom:4px;">岡山大学 理学部 化学科 2年</div>
+          <div style="font-size:12px; color:var(--ink-mute);">鹿島高校 卒業（鹿島市出身）</div>
+        </div>
+      </div>
+      <p style="font-size:14px; line-height:2.0; margin-bottom:24px; padding:18px 20px; background:var(--paper-warm); border-left:3px solid var(--accent);">「鹿島の海沿いで育って、岡山に出てきて2年目。有田焼の話とか、地元のことを聞かれて答えられないのが悔しくて、ちゃんと知ろうと思って書いています。」</p>
+      <div style="font-size:11px; letter-spacing:0.15em; color:var(--ink-light); margin-bottom:12px;">3つの質問</div>
+      <div style="font-size:13px; line-height:1.95; margin-bottom:20px;">
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 佐賀で好きな場所は？<br><strong style="color:var(--accent);">A.</strong> 祐徳稲荷神社の山道。空気が違う気がします。</div>
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 実家に帰ったら必ず食べるものは？<br><strong style="color:var(--accent);">A.</strong> 有明海の海苔と、地元の干物。</div>
+        <div><strong style="color:var(--ink-mute);">Q.</strong> 最近ハマっていることは？<br><strong style="color:var(--accent);">A.</strong> 大学の有機化学実験と、岡山の地酒。</div>
+      </div>
+      <div style="padding:14px 18px; background:var(--paper-warm); margin-bottom:20px;">
+        <div style="font-size:10px; color:var(--ink-mute); letter-spacing:0.1em; margin-bottom:4px;">記者として</div>
+        <div style="font-size:13px;">制度・素材産業領域。論理性を活かした体験ルポを書きます。</div>
+      </div>
+      <div style="border-top:1px solid var(--line-faint); padding-top:16px;">
+        <div style="font-size:11px; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:10px;">執筆記事</div>
+        <a href="#feature-page" style="display:block; font-size:13px; padding:8px 0; line-height:1.6;">【調べてみた】佐賀県には奨学金返還支援制度というのがあるらしい<span style="font-size:10px; color:var(--ink-light); margin-left:8px;">2027.03 公開予定</span></a>
+      </div>
+    </div>
+
+    <!-- ⑤ 江口 葉月 -->
+    <div style="background:white; padding:36px; border:1px solid var(--line);">
+      <div style="display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:24px;">
+        <div class="img-ph" style="aspect-ratio:1;">顔写真</div>
+        <div>
+          <h3 class="sub-title" style="font-size:20px; margin-bottom:6px;">江口 葉月<span style="font-size:11px; color:var(--ink-light); margin-left:8px; font-weight:400;">えぐち はづき</span></h3>
+          <div style="font-size:12px; color:var(--ink-mute); margin-bottom:4px;">龍谷大学 文学部 日本語日本文学科 3年</div>
+          <div style="font-size:12px; color:var(--ink-mute);">伊万里高校 卒業（伊万里市出身）</div>
+        </div>
+      </div>
+      <p style="font-size:14px; line-height:2.0; margin-bottom:24px; padding:18px 20px; background:var(--paper-warm); border-left:3px solid var(--accent);">「伊万里の窯元の街で育ったけれど、焼物のこと、ちゃんと知らないまま出てきました。言葉で残すなら、いまかなと思っています。」</p>
+      <div style="font-size:11px; letter-spacing:0.15em; color:var(--ink-light); margin-bottom:12px;">3つの質問</div>
+      <div style="font-size:13px; line-height:1.95; margin-bottom:20px;">
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 佐賀で好きな場所は？<br><strong style="color:var(--accent);">A.</strong> 伊万里大川内山の窯元の路地。</div>
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 実家に帰ったら必ず食べるものは？<br><strong style="color:var(--accent);">A.</strong> 伊万里牛と、おばあちゃんのごどうふ。</div>
+        <div><strong style="color:var(--ink-mute);">Q.</strong> 最近ハマっていることは？<br><strong style="color:var(--accent);">A.</strong> 京都の純喫茶巡りと、近代日本文学の卒論準備。</div>
+      </div>
+      <div style="padding:14px 18px; background:var(--paper-warm); margin-bottom:20px;">
+        <div style="font-size:10px; color:var(--ink-mute); letter-spacing:0.1em; margin-bottom:4px;">記者として</div>
+        <div style="font-size:13px;">文化・グルメ領域。佐賀の味や記憶を、自分の言葉で残します。</div>
+      </div>
+      <div style="border-top:1px solid var(--line-faint); padding-top:16px;">
+        <div style="font-size:11px; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:10px;">執筆記事</div>
+        <a href="#feature-page" style="display:block; font-size:13px; padding:8px 0; line-height:1.6;">【全力レポート】佐賀ラーメンが進化していた<span style="font-size:10px; color:var(--ink-light); margin-left:8px;">2026.12 公開予定</span></a>
+      </div>
+    </div>
+
+    <!-- ⑥ 池田 拓海 -->
+    <div style="background:white; padding:36px; border:1px solid var(--line);">
+      <div style="display:grid; grid-template-columns:120px 1fr; gap:24px; margin-bottom:24px;">
+        <div class="img-ph" style="aspect-ratio:1;">顔写真</div>
+        <div>
+          <h3 class="sub-title" style="font-size:20px; margin-bottom:6px;">池田 拓海<span style="font-size:11px; color:var(--ink-light); margin-left:8px; font-weight:400;">いけだ たくみ</span></h3>
+          <div style="font-size:12px; color:var(--ink-mute); margin-bottom:4px;">九州大学 農学部 2年</div>
+          <div style="font-size:12px; color:var(--ink-mute);">致遠館高校 卒業（佐賀市出身）</div>
+        </div>
+      </div>
+      <p style="font-size:14px; line-height:2.0; margin-bottom:24px; padding:18px 20px; background:var(--paper-warm); border-left:3px solid var(--accent);">「実家が農家なんですが、ちゃんと佐賀の農業を学んだのは大学に入ってから。書くことで、自分のためにも整理してみたいです。」</p>
+      <div style="font-size:11px; letter-spacing:0.15em; color:var(--ink-light); margin-bottom:12px;">3つの質問</div>
+      <div style="font-size:13px; line-height:1.95; margin-bottom:20px;">
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 佐賀で好きな場所は？<br><strong style="color:var(--accent);">A.</strong> 神埼の田園風景。佐賀平野の朝。</div>
+        <div style="margin-bottom:8px;"><strong style="color:var(--ink-mute);">Q.</strong> 実家に帰ったら必ず食べるものは？<br><strong style="color:var(--accent);">A.</strong> 父の作ったお米と、地元のごぼう天うどん。</div>
+        <div><strong style="color:var(--ink-mute);">Q.</strong> 最近ハマっていることは？<br><strong style="color:var(--accent);">A.</strong> 大学の畑作業と、糸島のカフェ巡り。</div>
+      </div>
+      <div style="padding:14px 18px; background:var(--paper-warm); margin-bottom:20px;">
+        <div style="font-size:10px; color:var(--ink-mute); letter-spacing:0.1em; margin-bottom:4px;">記者として</div>
+        <div style="font-size:13px;">農・食・暮らし領域。佐賀の田畑や食卓を当事者目線で書きます。</div>
+      </div>
+      <div style="border-top:1px solid var(--line-faint); padding-top:16px;">
+        <div style="font-size:11px; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:10px;">執筆記事</div>
+        <a href="#article-page" style="display:block; font-size:13px; padding:8px 0; line-height:1.6;">サガシル福岡で見えた、出身者も知らなかった佐賀<span style="font-size:10px; color:var(--ink-light); margin-left:8px;">2027.02 公開予定</span></a>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center; margin-top:64px;">
+    <a href="#recruit-page" class="btn btn-arrow">+ 学生記者として参加する</a>
+  </div>
+</div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">RECRUIT PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== RECRUIT PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="recruit-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+
+<section class="recruit-hero">
+  <span class="accent-label">STUDENT REPORTER PROGRAM</span>
+  <h1>佐賀に帰る往復交通費、<br>佐賀県が、負担します。</h1>
+  <p>佐賀を出た学生を、"学生記者" として募集しています。<br>地元を取材して、同じく外にいる仲間に届けてくれませんか。</p>
+  <a href="#" class="btn btn-arrow">応募フォームへ</a>
+</section>
+
+<section class="section">
+<div class="container-wide">
+  <div class="section-label">WHY</div>
+  <h2 class="section-title">プログラムの3つのポイント</h2>
+
+  <div class="why-row">
+    <div class="why-item">
+      <div class="num">01</div>
+      <h4 class="item-title">外にいるから、見える</h4>
+      <p>県外に出てみて、初めて気づく佐賀の魅力があります。同じ立場の仲間に届く言葉で、それを書けるのは、あなたの強みです。</p>
+    </div>
+    <div class="why-item">
+      <div class="num">02</div>
+      <h4 class="item-title">取材で、地元を再発見</h4>
+      <p>取材を通じて、地元の人・お店・会社をあらためて訪ねます。実家じゃない佐賀と、出会い直す時間です。</p>
+    </div>
+    <div class="why-item">
+      <div class="num">03</div>
+      <h4 class="item-title">交通費は、こちら持ち</h4>
+      <p>取材で帰省するときの交通費は、こちらで負担します。実質、無料で佐賀に帰れる仕組みです。</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="section section-warm">
+<div class="container">
+  <div class="section-label">REQUIREMENTS</div>
+  <h2 class="section-title">募集要項</h2>
+
+  <table class="recruit-table">
+    <tr><th>対象</th><td>佐賀県出身で、県外の大学・短大・専門学校・大学院・高専に通っている方</td></tr>
+    <tr><th>活動期間</th><td>半年〜1年（応相談）</td></tr>
+    <tr><th>執筆本数</th><td>活動期間中に1〜2本</td></tr>
+    <tr><th>支給</th><td>帰省交通費（往復実費）と、執筆ごとの謝礼</td></tr>
+    <tr><th>サポート</th><td>取材メモから記事になるまで、編集者がサポートします</td></tr>
+    <tr><th>必要なもの</th><td>「同郷の仲間に佐賀を伝えたい」気持ち（経験は問いません）</td></tr>
+  </table>
+</div>
+</section>
+
+<section class="section">
+<div class="container-wide">
+  <div class="section-label">FLOW</div>
+  <h2 class="section-title">応募から取材までの流れ</h2>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:48px;">
+    <div style="border:1px solid var(--line); padding:24px; text-align:center;">
+      <div style="font-size:11px; color:var(--ink-light); letter-spacing:0.15em; margin-bottom:8px;">STEP 01</div>
+      <div style="font-size:14px; font-weight:500;">応募フォーム</div>
+    </div>
+    <div style="border:1px solid var(--line); padding:24px; text-align:center;">
+      <div style="font-size:11px; color:var(--ink-light); letter-spacing:0.15em; margin-bottom:8px;">STEP 02</div>
+      <div style="font-size:14px; font-weight:500;">オンライン面談</div>
+    </div>
+    <div style="border:1px solid var(--line); padding:24px; text-align:center;">
+      <div style="font-size:11px; color:var(--ink-light); letter-spacing:0.15em; margin-bottom:8px;">STEP 03</div>
+      <div style="font-size:14px; font-weight:500;">企画決定</div>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px;">
+    <div style="border:1px solid var(--line); padding:24px; text-align:center;">
+      <div style="font-size:11px; color:var(--ink-light); letter-spacing:0.15em; margin-bottom:8px;">STEP 04</div>
+      <div style="font-size:14px; font-weight:500;">帰省・取材</div>
+    </div>
+    <div style="border:1px solid var(--line); padding:24px; text-align:center;">
+      <div style="font-size:11px; color:var(--ink-light); letter-spacing:0.15em; margin-bottom:8px;">STEP 05</div>
+      <div style="font-size:14px; font-weight:500;">編集者と記事化</div>
+    </div>
+    <div style="background:var(--accent); color:white; padding:24px; text-align:center;">
+      <div style="font-size:11px; opacity:0.85; letter-spacing:0.15em; margin-bottom:8px;">STEP 06</div>
+      <div style="font-size:14px; font-weight:500;">公開・拡散</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="section section-warm">
+<div class="container">
+  <div class="section-label">APPLY</div>
+  <h2 class="section-title">応募する</h2>
+  <p class="lead" style="color:var(--ink-mute);">気になった方は、まずはお気軽にご応募ください。応募後にオンラインで面談しますので、その場でご質問いただけます。</p>
+
+  <form style="margin-top:48px;">
+    <div class="form-row">
+      <div>
+        <div class="form-field-label">お名前</div>
+        <input type="text" class="form-input" />
+      </div>
+      <div>
+        <div class="form-field-label">大学名・学年</div>
+        <input type="text" class="form-input" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <div class="form-field-label">出身高校</div>
+        <input type="text" class="form-input" />
+      </div>
+      <div>
+        <div class="form-field-label">連絡先メールアドレス</div>
+        <input type="email" class="form-input" />
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div class="form-field-label">取材で書いてみたい記事のアイデア（自由にどうぞ）</div>
+      <textarea class="form-textarea"></textarea>
+    </div>
+    <button type="button" class="btn" style="width:100%; padding:18px; background:var(--accent); border-color:var(--accent);">応募する</button>
+  </form>
+</div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">EVENT PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== EVENT PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="event-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<section class="section">
+<div class="container">
+  <div class="section-label">NEWS</div>
+  <h1 class="hero-title" style="font-size:36px;">佐賀県からのおしらせ</h1>
+  <p class="lead" style="color:var(--ink-mute);">就活や交流のイベントを、帰省のタイミングに合わせて開催しています。LINEでも個別にお知らせしています。</p>
+</div>
+</section>
+
+<section class="section section-warm">
+<div class="container-wide">
+  <!-- Pickup -->
+  <div style="background:var(--accent); color:white; padding:48px; display:grid; grid-template-columns:1fr 200px; gap:32px; align-items:center;">
+    <div>
+      <div style="font-size:11px; letter-spacing:0.2em; opacity:0.85; margin-bottom:12px;">PICK UP ／ 2026.12.13 開催</div>
+      <h2 style="font-size:28px; font-weight:500; margin-bottom:16px; color:white; line-height:1.5;">佐賀さいこう！暮らし＆しごと体感フェア</h2>
+      <p style="font-size:14px; opacity:0.9; line-height:1.95; margin-bottom:24px;">東京圏で暮らす20〜40代に向けて、佐賀の暮らしとしごとの魅力を一体的に体感できる、佐賀県主催のイベントです。佐賀出身者の参加も歓迎。</p>
+      <a href="#" class="btn btn-outline btn-arrow" style="border-color:white; color:white; background:transparent;">詳細・申込</a>
+    </div>
+    <div class="img-ph img-ph-square" style="background:rgba(255,255,255,0.15); border:none; color:rgba(255,255,255,0.5);">サムネ</div>
+  </div>
+
+  <!-- Filter -->
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin:48px 0;">
+    <a href="#" class="btn" style="padding:8px 18px; font-size:12px;">すべて</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">県のイベント</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">県の制度</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">プレゼント企画</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">サイトからのお知らせ</a>
+  </div>
+
+  <!-- News list -->
+  <div class="news-list">
+    <a href="#" class="news-item">
+      <div class="news-date">2026.10.01</div>
+      <div class="news-cat" style="color:var(--accent)">サイト</div>
+      <div class="news-title">
+        「つながるさが」公開のお知らせ
+        <div style="font-size:12px; color:var(--ink-mute); font-weight:400; margin-top:4px;">佐賀を出た学生のためのメディア「つながるさが」が、本日公開になりました。LINE登録もぜひ。</div>
+      </div>
+      <div class="news-arrow">→</div>
+    </a>
+    <a href="#" class="news-item">
+      <div class="news-date">2026.12.13</div>
+      <div class="news-cat" style="color:#534AB7">イベント ・ 東京</div>
+      <div class="news-title">
+        佐賀さいこう！暮らし＆しごと体感フェア
+        <div style="font-size:12px; color:var(--ink-mute); font-weight:400; margin-top:4px;">佐賀の暮らしとしごとを、東京で一体的に体感できる佐賀県主催のイベント。学生記者・松尾が現地レポートします。</div>
+      </div>
+      <div class="news-arrow">→</div>
+    </a>
+    <a href="#" class="news-item">
+      <div class="news-date">2026.12.15</div>
+      <div class="news-cat" style="color:#BA7517">プレゼント</div>
+      <div class="news-title">
+        LINE登録者限定 佐賀牛プレゼントキャンペーン
+        <div style="font-size:12px; color:var(--ink-mute); font-weight:400; margin-top:4px;">LINE登録者の中から、抽選で20名さまに佐賀牛をプレゼントします。応募はLINEから。</div>
+      </div>
+      <div class="news-arrow">→</div>
+    </a>
+    <a href="#" class="news-item">
+      <div class="news-date">2027.01-02月</div>
+      <div class="news-cat" style="color:#534AB7">イベント ・ 福岡</div>
+      <div class="news-title">
+        さがを深く知る交流会「サガシル福岡」
+        <div style="font-size:12px; color:var(--ink-mute); font-weight:400; margin-top:4px;">福岡の大学1〜2年生を対象にした、佐賀県内企業の魅力や暮らしの良さを知る1泊2日のイベント。学生記者・池田が参加レポートします。</div>
+      </div>
+      <div class="news-arrow">→</div>
+    </a>
+    <a href="#" class="news-item">
+      <div class="news-date">通年</div>
+      <div class="news-cat" style="color:var(--accent)">制度</div>
+      <div class="news-title">
+        UJIターン就職活動交通費支援事業
+        <div style="font-size:12px; color:var(--ink-mute); font-weight:400; margin-top:4px;">佐賀へのUJIターン就職活動にかかる交通費を、佐賀県が支援する事業です。対象・申請方法は公式ページから。</div>
+      </div>
+      <div class="news-arrow">→</div>
+    </a>
+    <a href="#" class="news-item">
+      <div class="news-date">通年</div>
+      <div class="news-cat" style="color:var(--accent)">制度</div>
+      <div class="news-title">
+        奨学金返還支援事業
+        <div style="font-size:12px; color:var(--ink-mute); font-weight:400; margin-top:4px;">佐賀の認定企業に就職し県内に定住する若い人の、奨学金返還を支援する制度。詳しくは特集記事と公式ページで。</div>
+      </div>
+      <div class="news-arrow">→</div>
+    </a>
+  </div>
+</div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<div class="page-divider">ARCHIVE PAGE</div>
+
+<!-- ============================================================ -->
+<!-- ===== ARCHIVE PAGE ===== -->
+<!-- ============================================================ -->
+
+<main id="archive-page">
+<header class="designed-header" style="background: var(--paper);">
+  <div class="designed-logo">&amp;SAGA</div>
+  <nav class="designed-nav">
+    <a href="#about-page">つながるさがとは</a>
+    <a href="#archive-page">記事を読む</a>
+    <a href="#reporters-page">学生記者</a>
+    <a href="#event-page">おしらせ</a>
+    <a href="#recruit-page">記者になる</a>
+    <a href="#" class="designed-line-btn">LINE登録</a>
+  </nav>
+</header>
+
+<section class="section">
+<div class="container-wide">
+  <div class="section-label">ARTICLES</div>
+  <h1 class="hero-title" style="font-size:36px;">記事一覧</h1>
+  <p class="lead" style="color:var(--ink-mute);">テーマ・書き手・タイプから、記事を探せます。</p>
+
+  <div style="margin-top:48px; display:flex; gap:12px; align-items:center; padding:16px; border:1px solid var(--line); background:var(--paper-warm);">
+    <div style="font-size:14px; color:var(--ink-light); flex:1;">🔍 キーワードで記事を検索</div>
+    <button class="btn">検索</button>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div style="font-size:11px; color:var(--ink-mute); letter-spacing:0.15em; margin-bottom:12px;">テーマ</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px;">
+      <a href="#" class="btn" style="padding:8px 18px; font-size:12px;">すべて</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">しごと</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">暮らし</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">グルメ</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">カルチャー</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">制度</a>
+    </div>
+    <div style="font-size:11px; color:var(--ink-mute); letter-spacing:0.15em; margin-bottom:12px;">書き手</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px;">
+      <a href="#" class="btn" style="padding:8px 18px; font-size:12px;">すべて</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">学生記者</a>
+      <a href="#" class="btn btn-outline" style="padding:8px 18px; font-size:12px;">編集部</a>
+    </div>
+  </div>
+
+  <div style="margin-top:64px; display:grid; grid-template-columns:repeat(3,1fr); gap:48px;">
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">カルチャー</span>
+        <span class="meta-tag" style="background:white;">学生記者</span>
+      </div>
+      <div class="meta">2026.10.15 ・ 6min read ・ by 中島 莉子</div>
+      <h4 class="item-title">日本一有名な「佐賀ちゃん」と巡る、佐賀の街の楽しみ方</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">しごと</span>
+        <span class="meta-tag" style="background:white;">学生記者</span>
+      </div>
+      <div class="meta">2026.11.14 ・ 8min read ・ by 古賀 蒼</div>
+      <h4 class="item-title">Uターンで佐賀に戻った先輩に質問をぶつけてみた</h4>
+    </a>
+    <a href="#feature-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">グルメ</span>
+      </div>
+      <div class="meta">2026.12.20 ・ 12min read ・ by 江口 葉月</div>
+      <h4 class="item-title">【全力レポート】佐賀ラーメンが進化していた</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">しごと</span>
+        <span class="meta-tag" style="background:white;">学生記者</span>
+      </div>
+      <div class="meta">2027.01.20 ・ 6min read ・ by 松尾 海斗</div>
+      <h4 class="item-title">【現地レポ】東京で開催された「佐賀の暮らし＆しごと」フェアに行ってきた</h4>
+    </a>
+    <a href="#article-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">暮らし</span>
+        <span class="meta-tag" style="background:white;">学生記者</span>
+      </div>
+      <div class="meta">2027.02.18 ・ 7min read ・ by 池田 拓海</div>
+      <h4 class="item-title">サガシル福岡で見えた、出身者も知らなかった佐賀</h4>
+    </a>
+    <a href="#feature-page" class="article-card-link">
+      <div class="img-ph img-ph-thumb">サムネ</div>
+      <div class="meta">
+        <span class="meta-tag">制度</span>
+      </div>
+      <div class="meta">2027.03.15 ・ 13min read ・ by 副島 智樹</div>
+      <h4 class="item-title">【調べてみた】佐賀県には奨学金返還支援制度というのがあるらしい</h4>
+    </a>
+  </div>
+
+  <div style="text-align:center; margin-top:80px; display:flex; justify-content:center; gap:6px;">
+    <a href="#" class="btn btn-outline" style="padding:8px 14px; font-size:12px;">‹ 前</a>
+    <a href="#" class="btn" style="padding:8px 16px; font-size:12px;">1</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 16px; font-size:12px;">2</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 16px; font-size:12px;">3</a>
+    <a href="#" class="btn btn-outline" style="padding:8px 14px; font-size:12px;">次 ›</a>
+  </div>
+</div>
+</section>
+</main>
+
+
+<!-- ============================================================ -->
+<!-- ===== Footer (designed, all pages) ===== -->
+<!-- ============================================================ -->
+<footer class="footer designed-footer">
+  <div class="designed-footer-inner">
+    <div>
+      <div class="designed-footer-logo">&amp;SAGA</div>
+      <p class="designed-footer-tag">佐賀を出た学生のための、佐賀のメディア。<br>あの頃気づけなかった佐賀の魅力を、同世代の言葉で。</p>
+    </div>
+    <div class="designed-footer-cols">
+      <div>
+        <div class="designed-footer-col-label">読む</div>
+        <a href="#archive-page" class="designed-footer-link">記事一覧</a>
+        <a href="#feature-page" class="designed-footer-link">特集記事</a>
+        <a href="#archive-page" class="designed-footer-link">テーマから探す</a>
+      </div>
+      <div>
+        <div class="designed-footer-col-label">学生記者</div>
+        <a href="#reporters-page" class="designed-footer-link">記者紹介</a>
+        <a href="#recruit-page" class="designed-footer-link">学生記者になる</a>
+        <a href="#event-page" class="designed-footer-link">イベント情報</a>
+      </div>
+      <div>
+        <div class="designed-footer-col-label">関連サイト</div>
+        <a href="https://ss.saga-job.jp/" target="_blank" rel="noopener" class="designed-footer-link">さがジョブナビ ↗</a>
+        <a href="https://ss.saga-job.jp/scholarship/" target="_blank" rel="noopener" class="designed-footer-link">奨学金返還支援事業 ↗</a>
+        <a href="#about-page" class="designed-footer-link">このサイトについて</a>
+      </div>
+    </div>
+  </div>
+  <div class="designed-footer-bottom">
+    <div>運営：佐賀県産業人材課 ／ 0952-25-7310</div>
+    <div>© 2026 佐賀県</div>
+  </div>
+</footer>
+
+<div class="proto-tag">PROTOTYPE / 構成確認用モック</div>
+
+</div> <!-- /.canvas -->
+</div> <!-- /.layout -->
+
+
+<script>
+(function() {
+  const links = document.querySelectorAll('.sidebar-link');
+  const pages = document.querySelectorAll('main[id$="-page"]');
+  
+  function switchTo(targetId) {
+    pages.forEach(p => {
+      if (p.id === targetId) p.classList.add('active');
+      else p.classList.remove('active');
+    });
+    links.forEach(l => {
+      if (l.dataset.target === targetId) l.classList.add('active');
+      else l.classList.remove('active');
+    });
+    // Toggle body class for designed-top (hides standard site-header)
+    if (targetId === 'top-page') document.body.classList.add('on-designed-top');
+    else document.body.classList.remove('on-designed-top');
+    document.querySelector('.canvas').scrollIntoView({block: 'start'});
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+  // Initialize on load
+  if (document.querySelector('main#top-page.active')) {
+    document.body.classList.add('on-designed-top');
+  }
+
+  // Sidebar clicks
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTo(link.dataset.target);
+    });
+  });
+
+  // Internal anchor links (like href="#feature-page") should also switch tabs
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    const href = a.getAttribute('href');
+    if (href === '#' || href.length < 2) return;
+    const targetId = href.substring(1);
+    // Check if it matches a page id
+    if (document.getElementById(targetId) && targetId.endsWith('-page')) {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTo(targetId);
+      });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
